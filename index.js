@@ -21,11 +21,9 @@ app.get('/api/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
     console.log(`Result::${result.row[0]}`);
-
-    
     res.send(result.rows[0]);
   } catch (error) {
-    res.status(500).send('Database query error');
+    res.status(500).send('Database query err');
   }
 });
 
