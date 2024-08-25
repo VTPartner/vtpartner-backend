@@ -20,7 +20,7 @@ const pool = new Pool({
 app.get('/api/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
-    console.log(`Result::${result.rows[0]}`);
+    // console.log(`Result::${result.rows[0]}`);
     res.send(result.rows[0]);
   } catch (err) {
     console.error('Error executing query', err.stack);
