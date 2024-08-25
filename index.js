@@ -5,19 +5,28 @@ const db = require('./db'); // Import the database functions
 const app = express();
 app.use(bodyParser.json()); // To parse JSON bodies
 
-app.get("/api/", async (req, res) => {
-  try {
-    const result = await db.selectQuery("SELECT NOW()");
-    res.send(result[0]);
-    console.log("Data Loaded Successfully");
-  } catch (err) {
-    if (err.message === "No data found") {
-      res.status(404).send("No data found");
-    } else {
-      res.status(500).send("An error occurred while processing your request");
+app.get('/api/', async (req, res) => {
+    try {
+      const result = await db.selectQuery('SELECT demoid, demo_name, demo_age FROM demo_tbl');
+  
+      // Transform the result to use custom keys
+      if (result.length === 0) {
+        res.status(404).send({ message: 'No data found' });
+      } else {
+        const transformedResult = result.map(item => ({
+          id: item.demoid,
+          name: item.demo_name,
+          age: item.demo_age
+        }));
+  
+        res.status(200).send({ data: transformedResult });
+      }
+      
+    } catch (err) {
+      console.error('Error executing query', err.stack);
+      res.status(500).send({ message: 'An error occurred while processing your request' });
     }
-  }
-});
+  });
 
 app.post("/api/insert", async (req, res) => {
   try {

@@ -16,10 +16,12 @@ const pool = new Pool({
 // Function to execute a SELECT query
 async function selectQuery(query, params = []) {
   try {
+    console.log("Query::=>",query);
     const result = await pool.query(query, params);
     if (result.rows.length === 0) {
       throw new Error('No data found');
     }
+    
     return result.rows;
   } catch (err) {
     if (err.message === 'No data found') {
@@ -34,6 +36,7 @@ async function selectQuery(query, params = []) {
 // Function to execute an INSERT query
 async function insertQuery(query, params) {
   try {
+    console.log("Insert Query::=>",query);
     const result = await pool.query(query, params);
     if (result.rowCount === 0) {
       throw new Error('Insert operation failed');
@@ -52,6 +55,7 @@ async function insertQuery(query, params) {
 // Function to execute an UPDATE query
 async function updateQuery(query, params) {
   try {
+    console.log("Update Query::=>",query);
     const result = await pool.query(query, params);
     if (result.rowCount === 0) {
       throw new Error('Update operation failed or no rows affected');
