@@ -18,11 +18,14 @@ const pool = new Pool({
 
 
 app.get('/api/', async (req, res) => {
-  
+  try {
     const result = await pool.query('SELECT NOW()');
-    console.log(`Result::${result.row[0]}`);
+    console.log(`Result::${result.rows[0]}`);
     res.send(result.rows[0]);
-  
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).send('Error executing query');
+  }
 });
 
 const port = process.env.PORT || 3000;
