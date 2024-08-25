@@ -22,6 +22,7 @@ app.get('/api/', async (req, res) => {
     const result = await pool.query('SELECT NOW()');
     // console.log(`Result::${result.rows[0]}`);
     res.send(result.rows[0]);
+    console.log("Data Loaded Successfully");
   } catch (err) {
     console.error('Error executing query', err.stack);
     res.status(500).send('Error executing query');
