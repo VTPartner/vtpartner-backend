@@ -21,6 +21,7 @@ app.get('/api/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
     console.log(`Result::${result.row[0]}`);
+
     
     res.send(result.rows[0]);
   } catch (error) {
