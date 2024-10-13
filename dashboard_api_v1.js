@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
     );
 
     if (result.length === 0) {
-      return res.status(404).send({ message: "User not found" });
+      return res.status(404).send({ message: "Admin Not Found" });
     }
 
     const user = result[0];
@@ -31,8 +31,9 @@ router.post("/login", async (req, res) => {
     res.status(200).send({
       token,
       user: {
-        admin_id: user.admin_id,
-        admin_name: user.admin_name,
+        id: user.admin_id,
+        role: user.admin_role,
+        name: user.admin_name,
         email: user.email,
       },
     });
