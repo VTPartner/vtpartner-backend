@@ -25,7 +25,7 @@ async function selectQuery(query, params = []) {
     return result.rows;
   } catch (err) {
     if (err.message === "No Data Found") {
-      console.error("Error: No data found for the provided query");
+      console.error("Error: No Data Found");
     } else {
       console.error("Error executing query", err.stack);
     }
