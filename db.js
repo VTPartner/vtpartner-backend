@@ -39,7 +39,7 @@ async function insertQuery(query, params) {
     console.log("Insert Query::=>",query);
     const result = await pool.query(query, params);
     if (result.rowCount === 0) {
-      throw new Error('Insert operation failed');
+      throw new Error("Insert operation failed");
     }
     return result.rowCount; // Returns the number of rows affected
   } catch (err) {

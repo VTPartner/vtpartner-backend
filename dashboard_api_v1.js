@@ -39,7 +39,9 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
-    res.status(500).send({ message: "An error occurred" });
+    if (err.stack.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "An error occurred" });
   }
 });
 
