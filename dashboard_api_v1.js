@@ -61,8 +61,8 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/all-branches", verifyToken, async (req, res) => {
-  const { admin_id, auth } = req.body;
+router.post("/all_branches", verifyToken, async (req, res) => {
+  const { admin_id } = req.body;
 
   try {
     const result = await db.selectQuery(
