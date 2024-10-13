@@ -1,9 +1,14 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-const db = require('./db'); // Import the database functions
+const dashboardApiV1 = require("./dashboard_api_v1"); // Import the dashboard API routes
 
 const app = express();
 app.use(bodyParser.json()); // To parse JSON bodies
+
+// Use the dashboard API routes under /api/v1/dashboard
+app.use("/api/v1/dashboard", dashboardApiV1);
+
+
 
 app.get('/api/', async (req, res) => {
     try {
