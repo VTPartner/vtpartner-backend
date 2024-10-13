@@ -1,8 +1,34 @@
 const express = require('express');
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const dashboardApiV1 = require("./dashboard_api_v1"); // Import the dashboard API routes
 
 const app = express();
+
+// Use CORS middleware to allow requests from multiple origins
+const allowedOrigins = [
+  "http://77.37.47.156:3786",
+  "https://vtpartner.org",
+  "http://localhost:3004",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "OPTIONS"], // Allow specific HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+  })
+);
+
 app.use(bodyParser.json()); // To parse JSON bodies
 
 // Use the dashboard API routes under /api/v1/dashboard
