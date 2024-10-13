@@ -10,7 +10,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const result = await db.selectQuery(
-      "SELECT admin_id, admin_name, gmail, password FROM vtpartner.admintbl WHERE gmail = $1 and password = $2",
+      "SELECT admin_id, admin_name, email, password FROM vtpartner.admintbl WHERE email = $1 and password = $2",
       [email, password]
     );
 
@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
       user: {
         admin_id: user.admin_id,
         admin_name: user.admin_name,
-        email: user.gmail,
+        email: user.email,
       },
     });
   } catch (err) {
