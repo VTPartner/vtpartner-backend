@@ -66,7 +66,7 @@ router.post("/all_branches", verifyToken, async (req, res) => {
 
   try {
     const result = await db.selectQuery(
-      "select branchtbl.branch_id,branch_name,location,city_id,branchtbl.reg_date,creation_time from vtpartner.branchtbl,vtpartner.admintbl where admintbl.branch_id=branchtbl.branch_id and admin_id=$1",
+      "select branchtbl.branch_id,branch_name,location,city_id,branchtbl.reg_date,creation_time,branch_status from vtpartner.branchtbl,vtpartner.admintbl where admintbl.branch_id=branchtbl.branch_id and admin_id=$1",
       [admin_id]
     );
 
