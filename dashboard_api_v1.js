@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
     );
 
     if (result.length === 0) {
-      return res.status(404).send({ message: "Admin Not Found" });
+      return res.status(404).send({ message: "No Data Found" });
     }
 
     const user = result[0];
@@ -39,8 +39,8 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
-    console.log("err.stack.message::::", err.stack.message);
-    if (err.stack.message === "No Data Found")
+    console.log("err.stack.message::::", err.message);
+    if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
     else res.status(500).send({ message: "An error occurred" });
   }
