@@ -19,7 +19,9 @@ async function selectQuery(query, params = []) {
     console.log("Query::=>",query);
     const result = await pool.query(query, params);
     if (result.rows.length === 0) {
-      throw new Error('No data found');
+      //throw new Error('No data found');
+      console.log("No data found for the provided query");
+      return [];
     }
     
     return result.rows;
