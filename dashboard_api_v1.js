@@ -5,6 +5,21 @@ const db = require("./db"); // Import the database functions
 
 const router = express.Router();
 
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token is sent in the Authorization header
+
+  if (!token) return res.status(403).send({ message: "Token is missing" });
+
+  try {
+    // Verify the token using the same secret used during token generation
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    req.user = decoded; // Attach decoded user info (e.g., admin_id, admin_name) to request object
+    next(); // Proceed to the next middleware or route handler
+  } catch (error) {
+    res.status(401).send({ message: "Invalid token" });
+  }
+};
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -72,20 +87,7 @@ router.post("/all-branches", verifyToken, async (req, res) => {
   }
 });
 
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token is sent in the Authorization header
 
-  if (!token) return res.status(403).send({ message: "Token is missing" });
-
-  try {
-    // Verify the token using the same secret used during token generation
-    const decoded = jwt.verify(token, "your_jwt_secret");
-    req.user = decoded; // Attach decoded user info (e.g., admin_id, admin_name) to request object
-    next(); // Proceed to the next middleware or route handler
-  } catch (error) {
-    res.status(401).send({ message: "Invalid token" });
-  }
-};
   
 
 module.exports = router;
