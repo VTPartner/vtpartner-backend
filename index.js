@@ -29,7 +29,6 @@ const allowedOrigins = [
 //   })
 // );
 
-import cors from "cors";
 const corsOrigin ={
     origin:'http://localhost:3004', //or whatever port your frontend is using
     credentials:true,            
