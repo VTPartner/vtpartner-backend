@@ -62,6 +62,7 @@ const upload = multer({
 app.post("/upload", (req, res) => {
   upload(req, res, (err) => {
     if (err) {
+      console.error("Upload error:", err);
       return res.status(500).send("Error uploading file.");
     }
     // Return the full image URL under your domain
