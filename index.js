@@ -42,10 +42,11 @@ app.use(bodyParser.json()); // To parse JSON bodies
 
 // Use the dashboard API routes under /api/v1/dashboard
 app.use("/api/v1/dashboard", dashboardApiV1);
-app.use("/uploads", express.static("/root/vtpartner-backend/uploads")); // Ensure path is correct
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "../..", "var/www/vtpartner.org/uploads"))); // Adjust according to your folder structure
 
 const storage = multer.diskStorage({
-  destination: "/root/vtpartner-backend/uploads", // Ensure 'uploads' folder exists
+  destination: path.join(__dirname, "../..", "var/www/vtpartner.org/uploads"), // Adjust according to your folder structure
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
