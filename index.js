@@ -44,10 +44,10 @@ app.use(bodyParser.json()); // To parse JSON bodies
 app.use("/api/v1/dashboard", dashboardApiV1);
 
 // Serve static files from the new uploads directory
-app.use("/uploads", express.static("/var/www/vtpartner.org/uploads")); // Pointing to your public uploads directory
+app.use("/uploads", express.static("/root/var/www/vtpartner.org/uploads")); // Pointing to your public uploads directory
 
 const storage = multer.diskStorage({
-  destination: "/var/www/vtpartner.org/uploads", // Pointing to your uploads directory for file storage
+  destination: "/root/var/www/vtpartner.org/uploads", // Pointing to your uploads directory for file storage
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
