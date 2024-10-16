@@ -124,7 +124,7 @@ router.post("/update_allowed_city",verifyToken, async (req, res) => {
   try {
     const { city_id,city_name,pincode,pincode_until,description,bg_image } = req.body;
     console.log(req.body);
-    if (!city_id || city_name || pincode || pincode_until || description || bg_image === undefined) {
+    if (!city_id || !city_name || !pincode || !pincode_until || !description || !bg_image) {
       return res
         .status(400)
         .send("Missing required fields: Error please check your keys and values you have passed");
