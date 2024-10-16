@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const dashboardApiV1 = require("./dashboard_api_v1"); // Import the dashboard API routes
 const multer = require("multer");
 const path = require("path");
+const sharp = require('sharp');
+
 
 const app = express();
 
