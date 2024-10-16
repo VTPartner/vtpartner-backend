@@ -43,11 +43,14 @@ app.use(bodyParser.json()); // To parse JSON bodies
 // Use the dashboard API routes under /api/v1/dashboard
 app.use("/api/v1/dashboard", dashboardApiV1);
 
-// Serve static files from the new uploads directory
+// Serve static files from the uploads directory
 app.use("/uploads", express.static("/root/var/www/vtpartner.org/uploads")); // Pointing to your public uploads directory
 
+// Multer storage configuration
 const storage = multer.diskStorage({
-  destination: "/root/var/www/vtpartner.org/uploads", // Pointing to your uploads directory for file storage
+  destination: function (req, file, cb) {
+    cb(null, "/root/var/www/vtpartner.org/uploads"); // Ensure the path is correct
+  },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
@@ -56,15 +59,25 @@ const storage = multer.diskStorage({
 // Init upload
 const upload = multer({
   storage: storage,
-  //limits: { fileSize: 1000000 }, // Limit file size to 1MB
+  // limits: { fileSize: 1000000 }, // Limit file size to 1MB if needed
 }).single("cityImage");
 
+// POST /upload endpoint
 app.post("/upload", (req, res) => {
+  console.log("Received upload request");
+
   upload(req, res, (err) => {
     if (err) {
       console.error("Upload error:", err);
       return res.status(500).send("Error uploading file.");
     }
+
+    // Check if the file was uploaded successfully
+    if (!req.file) {
+      console.error("No file received");
+      return res.status(400).send("No file received.");
+    }
+
     // Return the full image URL under your domain
     const imageUrl = `https://vtpartner.org/uploads/${req.file.filename}`;
     res.status(200).json({ imageUrl });
