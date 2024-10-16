@@ -54,7 +54,7 @@ const storage = multer.diskStorage({
 // Init upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // Limit file size to 1MB
+  // limits: { fileSize: 1000000 }, // Limit file size to 1MB
 }).single("cityImage");
 
 app.post("/upload", (req, res) => {
