@@ -42,10 +42,10 @@ app.use(bodyParser.json()); // To parse JSON bodies
 
 // Use the dashboard API routes under /api/v1/dashboard
 app.use("/api/v1/dashboard", dashboardApiV1);
-app.use("/uploads", express.static("uploads")); // Serve static files from 'uploads' directory
+app.use("/uploads", express.static("/root/vtpartner-backend/uploads")); // Ensure path is correct
 
 const storage = multer.diskStorage({
-  destination: "./uploads/", // Ensure 'uploads' folder exists
+  destination: "/root/vtpartner-backend/uploads", // Ensure 'uploads' folder exists
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
@@ -62,8 +62,8 @@ app.post("/upload", (req, res) => {
     if (err) {
       return res.status(500).send("Error uploading file.");
     }
-    // Return the image URL
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // Return the full image URL under your domain
+    const imageUrl = `https://vtpartner.org/uploads/${req.file.filename}`;
     res.status(200).json({ imageUrl });
   });
 });
