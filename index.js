@@ -46,28 +46,41 @@ app.use("/api/v1/dashboard", dashboardApiV1);
 // Serve static files from the new uploads directory
 app.use("/uploads", express.static("/root/var/www/vtpartner.org/uploads")); // Pointing to your public uploads directory
 
-const storage = multer.diskStorage({
-  destination: "/root/var/www/vtpartner.org/uploads", // Pointing to your uploads directory for file storage
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
-  },
-});
+// Use memory storage to handle file uploads in memory before processing
+const storage = multer.memoryStorage(); // Store files in memory for processing
 
 // Init upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // Limit file size to 1MB
+  // Remove the file size limit here
 }).single("cityImage");
 
 app.post("/upload", (req, res) => {
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       console.error("Upload error:", err);
       return res.status(500).send("Error uploading file.");
     }
-    // Return the full image URL under your domain
-    const imageUrl = `https://vtpartner.org/uploads/${req.file.filename}`;
-    res.status(200).json({ imageUrl });
+    
+    try {
+      // Create a unique filename
+      const filename = `cityImage-${Date.now()}.jpg`;
+      const outputPath = path.join("/root/var/www/vtpartner.org/uploads", filename);
+      
+      // Compress the image and save it
+      await sharp(req.file.buffer)
+        .resize({ width: 800 }) // Resize to 800px width while maintaining aspect ratio
+        .jpeg({ quality: 80, progressive: true }) // Compress to JPEG format with quality 80
+        .toFile(outputPath);
+
+      // Return the full image URL under your domain
+      const imageUrl = `https://vtpartner.org/uploads/${filename}`;
+      res.status(200).json({ imageUrl });
+      
+    } catch (compressErr) {
+      console.error("Compression error:", compressErr);
+      return res.status(500).send("Error compressing file.");
+    }
   });
 });
 
