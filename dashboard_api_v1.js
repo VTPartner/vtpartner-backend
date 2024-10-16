@@ -3,7 +3,10 @@ const express = require("express");
 const jwt = require("jsonwebtoken"); // for generating tokens
 const db = require("./db"); // Import the database functions
 
+
 const router = express.Router();
+
+
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token is sent in the Authorization header
@@ -19,6 +22,9 @@ const verifyToken = (req, res, next) => {
     res.status(401).send({ message: "Invalid token" });
   }
 };
+
+
+
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -115,5 +121,6 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
 
 
   
+
 
 module.exports = router;

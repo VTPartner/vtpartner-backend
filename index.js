@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dashboardApiV1 = require("./dashboard_api_v1"); // Import the dashboard API routes
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 
@@ -40,8 +42,31 @@ app.use(bodyParser.json()); // To parse JSON bodies
 
 // Use the dashboard API routes under /api/v1/dashboard
 app.use("/api/v1/dashboard", dashboardApiV1);
+app.use("/uploads", express.static("uploads")); // Serve static files from 'uploads' directory
 
+const storage = multer.diskStorage({
+  destination: "./uploads/", // Ensure 'uploads' folder exists
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
+  },
+});
 
+// Init upload
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1000000 }, // Limit file size to 1MB
+}).single("cityImage");
+
+router.post("/upload", (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(500).send("Error uploading file.");
+    }
+    // Return the image URL
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.status(200).json({ imageUrl });
+  });
+});
 
 app.get('/api/', async (req, res) => {
     try {
