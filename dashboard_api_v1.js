@@ -123,7 +123,7 @@ router.post("/update_allowed_city",verifyToken, async (req, res) => {
   console.log("Update Query::=>",verifyToken);
   try {
     const { city_id,city_name,pincode,pincode_until,description,bg_image } = req.body;
-
+    console.log(req.body);
     if (!city_id || city_name || pincode || pincode_until || description || bg_image === undefined) {
       return res
         .status(400)
