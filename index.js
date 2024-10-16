@@ -57,7 +57,7 @@ const upload = multer({
   limits: { fileSize: 1000000 }, // Limit file size to 1MB
 }).single("cityImage");
 
-router.post("/upload", (req, res) => {
+app.post("/upload", (req, res) => {
   upload(req, res, (err) => {
     if (err) {
       return res.status(500).send("Error uploading file.");
