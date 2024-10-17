@@ -96,7 +96,7 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
 
   try {
     const result = await db.selectQuery(
-      "select city_id,city_name,pincode,bg_image,time,pincode_until,description from vtpartner.available_citys_tbl order by city_id desc"
+      "select city_id,city_name,pincode,bg_image,time,pincode_until,description,status from vtpartner.available_citys_tbl order by city_id desc"
       // [admin_id]
     );
 
@@ -126,6 +126,7 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
       pincode_until,
       description,
       bg_image,
+      status,
     } = req.body;
 
     if (
@@ -134,7 +135,8 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
       !pincode ||
       !pincode_until ||
       !description ||
-      !bg_image
+      !bg_image ||
+      !status
     ) {
       return res
         .status(400)
@@ -144,13 +146,14 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
     }
 
     const query =
-      "UPDATE vtpartner.available_citys_tbl SET city_name = $1, pincode = $2, bg_image = $3, pincode_until = $4, description = $5, time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) WHERE city_id = $6";
+      "UPDATE vtpartner.available_citys_tbl SET city_name = $1, pincode = $2, bg_image = $3, pincode_until = $4, description = $5, time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), status=$6 WHERE city_id = $7";
     const values = [
       city_name,
       pincode,
       bg_image,
       pincode_until,
       description,
+      status,
       city_id,
     ];
     const rowCount = await db.updateQuery(query, values);
