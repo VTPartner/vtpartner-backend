@@ -128,7 +128,7 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
       bg_image,
       status,
     } = req.body;
-
+console.log("Update query Body::", req.body);
     if (
       !city_id ||
       !city_name ||
