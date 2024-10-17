@@ -138,6 +138,7 @@ console.log("Update query Body::", req.body);
       !bg_image ||
       !status
     ) {
+      console.log("Missing required fields:");
       return res
         .status(400)
         .send(
