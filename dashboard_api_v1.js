@@ -188,7 +188,6 @@ router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
 
     // List of required fields
     const requiredFields = {
-      city_id,
       city_name,
       pincode,
       pincode_until,
