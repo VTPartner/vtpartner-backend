@@ -6,6 +6,18 @@ const db = require("./db"); // Import the database functions
 
 const router = express.Router();
 
+// Utility function to validate required fields
+const checkMissingFields = (requiredFields) => {
+  const missingFields = Object.keys(requiredFields).filter(
+    (field) =>
+      requiredFields[field] === undefined ||
+      requiredFields[field] === null ||
+      requiredFields[field] === ""
+  );
+  
+  // Return missing fields if any, otherwise return null
+  return missingFields.length > 0 ? missingFields : null;
+};
 
 
 const verifyToken = (req, res, next) => {
@@ -128,22 +140,26 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
       bg_image,
       status,
     } = req.body;
-console.log("Update query Body::", req.body);
-    if (
-      !city_id ||
-      !city_name ||
-      !pincode ||
-      !pincode_until ||
-      !description ||
-      !bg_image ||
-      !status
-    ) {
-      console.log("Missing required fields:");
-      return res
-        .status(400)
-        .send(
-          "Missing required fields: Error please check your keys and values you have passed"
-        );
+    console.log("Update query Body::", req.body);
+    // List of required fields
+    const requiredFields = {
+      city_id,
+      city_name,
+      pincode,
+      pincode_until,
+      description,
+      bg_image,
+      status,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
     }
 
     const query =
@@ -167,10 +183,18 @@ console.log("Update query Body::", req.body);
 
 router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
   try {
-    const { city_name, pincode, pincode_until, description, bg_image } =
+    const { city_name, pincode, pincode_until, description, bg_image, status } =
       req.body;
 
-    if (!city_name || !pincode || !pincode_until || !description || !bg_image) {
+    if (
+      !city_name ||
+      !pincode ||
+      !pincode_until ||
+      !description ||
+      status === undefined ||
+      status === null ||
+      !bg_image
+    ) {
       return res
         .status(400)
         .send(
