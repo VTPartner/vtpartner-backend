@@ -183,23 +183,27 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
 
 router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
   try {
-    const { city_name, pincode, pincode_until, description, bg_image, status } =
+    const { city_name, pincode, pincode_until, description, bg_image } =
       req.body;
 
-    if (
-      !city_name ||
-      !pincode ||
-      !pincode_until ||
-      !description ||
-      status === undefined ||
-      status === null ||
-      !bg_image
-    ) {
-      return res
-        .status(400)
-        .send(
-          "Missing required fields: Error please check your keys and values you have passed"
-        );
+    // List of required fields
+    const requiredFields = {
+      city_id,
+      city_name,
+      pincode,
+      pincode_until,
+      description,
+      bg_image,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
     }
 
     const query =
