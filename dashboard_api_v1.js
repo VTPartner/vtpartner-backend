@@ -24,8 +24,6 @@ const verifyToken = (req, res, next) => {
 };
 
 
-
-
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -63,7 +61,7 @@ router.post("/login", async (req, res) => {
     //console.log("err.stack.message::::", err.message);
     if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
-    else res.status(500).send({ message: "An error occurred" });
+    else res.status(500).send({ message: "Internal Server Error" });
   }
 });
 
@@ -98,7 +96,7 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
 
   try {
     const result = await db.selectQuery(
-      "select city_id,city_name,pincode,bg_image,time,pincode_until,description from vtpartner.available_citys_tbl",
+      "select city_id,city_name,pincode,bg_image,time,pincode_until,description from vtpartner.available_citys_tbl"
       // [admin_id]
     );
 
@@ -115,7 +113,7 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
     //console.log("err.stack.message::::", err.message);
     if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
-    else res.status(500).send({ message: "An error occurred" });
+    else res.status(500).send({ message: "Internal Server Error" });
   }
 });
 
