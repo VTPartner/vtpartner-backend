@@ -220,11 +220,10 @@ router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
   const { city_id } = req.body;
 
   try {
-    const result = await db.selectQuery(
-      "select pincode_id,allowed_pincodes_tbl.pincode,creation_time,allowed_pincodes_tbl.status from vtpartner.allowed_pincodes_tbl,vtpartner.available_citys_tbl where available_citys_tbl.city_id=allowed_pincodes_tbl.city_id and allowed_pincodes_tbl.city_id=$1 order by pincode_id desc;"[
-        city_id
-      ]
-    );
+    const query =
+      "select pincode_id,allowed_pincodes_tbl.pincode,creation_time,allowed_pincodes_tbl.status from vtpartner.allowed_pincodes_tbl,vtpartner.available_citys_tbl where available_citys_tbl.city_id=allowed_pincodes_tbl.city_id and allowed_pincodes_tbl.city_id=$1 order by pincode_id desc";
+    const values = [city_id];
+    const result = await db.selectQuery(query, values);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
