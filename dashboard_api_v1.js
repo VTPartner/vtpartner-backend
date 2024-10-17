@@ -116,13 +116,12 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
       return res.status(404).send({ message: "No Data Found" });
     }
 
-    // Return user branch data
+    
     res.status(200).send({
-      cities: result, // Send the array of branches
+      cities: result,
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
-    //console.log("err.stack.message::::", err.message);
     if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
     else res.status(500).send({ message: "Internal Server Error" });
@@ -216,6 +215,31 @@ router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
   }
 });
 
+
+router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
+  const { city_id } = req.body;
+
+  try {
+    const result = await db.selectQuery(
+      "select pincode_id,allowed_pincodes_tbl.pincode,creation_time,allowed_pincodes_tbl.status from vtpartner.allowed_pincodes_tbl,vtpartner.available_citys_tbl where available_citys_tbl.city_id=allowed_pincodes_tbl.city_id and allowed_pincodes_tbl.city_id=$1 order by pincode_id desc"[
+        city_id
+      ]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      pincodes: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 
 
