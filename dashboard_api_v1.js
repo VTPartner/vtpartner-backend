@@ -119,24 +119,71 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/update_allowed_city",verifyToken, async (req, res) => {
-  console.log("Update Query::=>",verifyToken);
+router.post("/update_allowed_city", verifyToken, async (req, res) => {
   try {
-    const { city_id,city_name,pincode,pincode_until,description,bg_image } = req.body;
-    console.log(req.body);
-    if (!city_id || !city_name || !pincode || !pincode_until || !description || !bg_image) {
+    const {
+      city_id,
+      city_name,
+      pincode,
+      pincode_until,
+      description,
+      bg_image,
+    } = req.body;
+
+    if (
+      !city_id ||
+      !city_name ||
+      !pincode ||
+      !pincode_until ||
+      !description ||
+      !bg_image
+    ) {
       return res
         .status(400)
-        .send("Missing required fields: Error please check your keys and values you have passed");
+        .send(
+          "Missing required fields: Error please check your keys and values you have passed"
+        );
     }
 
-    const query = "UPDATE vtpartner.available_citys_tbl SET city_name = $1, pincode = $2, bg_image = $3, pincode_until = $4, description = $5, time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) WHERE city_id = $6";
-    const values = [city_name, pincode, bg_image, pincode_until, description, city_id];
+    const query =
+      "UPDATE vtpartner.available_citys_tbl SET city_name = $1, pincode = $2, bg_image = $3, pincode_until = $4, description = $5, time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) WHERE city_id = $6";
+    const values = [
+      city_name,
+      pincode,
+      bg_image,
+      pincode_until,
+      description,
+      city_id,
+    ];
     const rowCount = await db.updateQuery(query, values);
     res.send(`${rowCount} rows updated`);
   } catch (err) {
-    console.error("Error executing UPDATE query", err.stack);
-    res.status(500).send("Error executing UPDATE query");
+    console.error("Error executing allowed city UPDATE query", err.stack);
+    res.status(500).send("Error executing allowed city UPDATE query");
+  }
+});
+
+router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
+  try {
+    const { city_name, pincode, pincode_until, description, bg_image } =
+      req.body;
+
+    if (!city_name || !pincode || !pincode_until || !description || !bg_image) {
+      return res
+        .status(400)
+        .send(
+          "Missing required fields: Error please check your keys and values you have passed"
+        );
+    }
+
+    const query =
+      "INSERT INTO vtpartner.available_citys_tbl (city_name,pincode,bg_image,pincode_until,description) VALUES ($1,$2,$3,$4,$5)";
+    const values = [city_name, pincode, bg_image, pincode_until, description];
+    const rowCount = await db.insertQuery(query, values);
+    res.send(`${rowCount} rows inserted`);
+  } catch (err) {
+    console.error("Error executing add new allowed city query", err.stack);
+    res.status(500).send("Error executing add new allowed city query");
   }
 });
 
