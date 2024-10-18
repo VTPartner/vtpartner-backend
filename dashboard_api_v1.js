@@ -353,7 +353,7 @@ router.post("/vehicle_types", verifyToken, async (req, res) => {
       "select vehicle_type_id,vehicle_type_name from vtpartner.vehicle_types_tbl";
     const values = [];
 
-    const result = await db.selectQuery(query, values);
+    const result = await db.selectQuery(query);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
@@ -376,7 +376,7 @@ router.post("/all_vehicles", verifyToken, async (req, res) => {
       "select vehicle_id,vehicle_name,weight,vehiclestbl.vehicle_type_id,description,image as vehicle_image,size_image as vehicle_size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id order by vehicle_id desc";
     const values = [];
 
-    const result = await db.selectQuery(query, values);
+    const result = await db.selectQuery(query);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
