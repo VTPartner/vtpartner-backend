@@ -262,7 +262,7 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
 
     const query =
       "INSERT INTO vtpartner.allowed_pincodes_tbl (pincode,city_id) VALUES ($1,$2)";
-    const values = [city_id, pincode];
+    const values = [pincode, city_id];
     const rowCount = await db.insertQuery(query, values);
     res.send(`${rowCount} rows inserted`);
   } catch (err) {
