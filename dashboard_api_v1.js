@@ -239,21 +239,23 @@ router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
 
   try {
     const query =
-      "SELECT pincode_id, allowed_pincodes_tbl.pincode, creation_time, allowed_pincodes_tbl.status " +
-      "FROM vtpartner.allowed_pincodes_tbl, vtpartner.available_citys_tbl " +
-      "WHERE available_citys_tbl.city_id = allowed_pincodes_tbl.city_id AND allowed_pincodes_tbl.city_id = $1 " +
-      "ORDER BY pincode_id DESC";
-
+      "select pincode_id,allowed_pincodes_tbl.pincode,creation_time,allowed_pincodes_tbl.status from vtpartner.allowed_pincodes_tbl,vtpartner.available_citys_tbl where available_citys_tbl.city_id=allowed_pincodes_tbl.city_id and allowed_pincodes_tbl.city_id=$1 order by pincode_id desc";
     const values = [city_id];
+    console.log("query==>", query);
     const result = await db.selectQuery(query, values);
 
     if (result.length === 0) {
-      return sendResponse(res, 404, null, "No Data Found");
+      return res.status(404).send({ message: "No Data Found" });
     }
 
-    sendResponse(res, 200, result);
+    res.status(200).send({
+      pincodes: result,
+    });
   } catch (err) {
-    handleError(res, err);
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
   }
 });
 
