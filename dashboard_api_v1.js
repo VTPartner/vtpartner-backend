@@ -318,8 +318,8 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1 AND city_id = $2";
-    const valuesDuplicateCheck = [pincode, city_id];
+      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1 AND city_id = $2 AND pincode_id != $3";
+    const valuesDuplicateCheck = [pincode, city_id, pincode_id];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
@@ -327,20 +327,27 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
     );
 
     // Check if the result is greater than 0 to determine if the pincode already exists
-    if (result.length > 0 && result[0].count > 0) {
+    if (result.length > 0 && parseInt(result[0].count) > 0) {
       return res.status(409).send({ message: "Pincode already exists" });
     }
 
     const query =
-      "UPDATE vtpartner.allowed_pincodes_tbl set pincode = $1,city_id =$2, status= $3 where pincode_id= $4";
+      "UPDATE vtpartner.allowed_pincodes_tbl SET pincode = $1, city_id = $2, status = $3 WHERE pincode_id = $4";
     const values = [pincode, city_id, pincode_status, pincode_id];
     const rowCount = await db.updateQuery(query, values);
-    res.send(`${rowCount} rows inserted`);
+
+    // Check if any rows were updated
+    if (rowCount > 0) {
+      res.send(`${rowCount} row(s) updated`);
+    } else {
+      res.status(404).send({ message: "Pincode not found" });
+    }
   } catch (err) {
     console.error("Error executing updating allowed pincodes query", err.stack);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 
 
