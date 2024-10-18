@@ -275,7 +275,7 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
 router.post("/edit_pincode", verifyToken, async (req, res) => {
   try {
     const { city_id, pincode, pincode_status, pincode_id } = req.body;
-
+console.log(req.body);
     // List of required fields
     const requiredFields = {
       city_id,
