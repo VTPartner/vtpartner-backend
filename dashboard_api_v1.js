@@ -215,7 +215,6 @@ router.post("/add_new_allowed_city", verifyToken, async (req, res) => {
   }
 });
 
-
 router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
   const { city_id } = req.body;
 
@@ -238,6 +237,37 @@ router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
     if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
     else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/add_new_pincode", verifyToken, async (req, res) => {
+  try {
+    const { city_id, pincode } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      city_id,
+      pincode,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "INSERT INTO vtpartner.allowed_pincodes_tbl (pincode,city_id) VALUES ($1,$2)";
+    const values = [city_id, pincode];
+    const rowCount = await db.insertQuery(query, values);
+    res.send(`${rowCount} rows inserted`);
+  } catch (err) {
+    console.error("Error executing add new allowed city query", err.stack);
+    res.status(500).send("Error executing add new allowed city query");
   }
 });
 
