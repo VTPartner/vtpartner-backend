@@ -306,7 +306,7 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
       WHERE pincode = $1 AND city_id = $2 AND pincode_id != $3
     `;
     const checkValues = [pincode, city_id, pincode_id];
-    const { rows } = await db.query(checkQuery, checkValues);
+    const { rows } = await db.selectQuery(checkQuery, checkValues);
 
     // Check if the result is valid and if there's already a matching pincode
     const count = rows && rows[0] ? parseInt(rows[0].count, 10) : 0;
