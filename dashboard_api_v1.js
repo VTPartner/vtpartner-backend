@@ -287,19 +287,12 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
 router.post("/edit_pincode", verifyToken, async (req, res) => {
   try {
     const { city_id, pincode, pincode_status, pincode_id } = req.body;
+    console.log(req.body);
 
     // List of required fields
-    const requiredFields = {
-      city_id,
-      pincode,
-      pincode_status,
-      pincode_id,
-    };
-
-    // Use the utility function to check for missing fields
+    const requiredFields = { city_id, pincode, pincode_status, pincode_id };
     const missingFields = checkMissingFields(requiredFields);
 
-    // If there are missing fields, return an error response
     if (missingFields) {
       console.log(`Missing required fields: ${missingFields.join(", ")}`);
       return res.status(400).send({
@@ -307,27 +300,32 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
       });
     }
 
-    // First, check if the pincode already exists in the database for the given city, but exclude the current pincode being edited
-    const checkQuery =
-      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode = $1 AND city_id = $2 AND pincode_id != $3";
+    // Check if pincode already exists for the city (excluding current pincode_id)
+    const checkQuery = `
+      SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl
+      WHERE pincode = $1 AND city_id = $2 AND pincode_id != $3
+    `;
     const checkValues = [pincode, city_id, pincode_id];
+    const { rows } = await db.query(checkQuery, checkValues);
 
-    const { rows } = await db.selectQuery(checkQuery, checkValues);
-    const count = parseInt(rows[0].count);
+    // Check if the result is valid and if there's already a matching pincode
+    const count = rows && rows[0] ? parseInt(rows[0].count, 10) : 0;
 
     if (count > 0) {
-      return res.status(409).send({
-        message: "Pincode already exists for the given city.",
-      });
+      // Pincode already exists, send an appropriate response
+      return res.status(409).send("Pincode already exists for this city.");
     }
 
-    // Proceed to update the pincode if it doesn't exist as a duplicate
-    const query =
-      "UPDATE vtpartner.allowed_pincodes_tbl SET pincode = $1, city_id = $2, status = $3 WHERE pincode_id = $4";
-    const values = [pincode, city_id, pincode_status, pincode_id];
+    // Proceed with updating the pincode
+    const updateQuery = `
+      UPDATE vtpartner.allowed_pincodes_tbl 
+      SET pincode = $1, city_id = $2, status = $3 
+      WHERE pincode_id = $4
+    `;
+    const updateValues = [pincode, city_id, pincode_status, pincode_id];
+    const updateResult = await db.updateQuery(updateQuery, updateValues);
 
-    const rowCount = await db.updateQuery(query, values);
-    res.send(`${rowCount} row(s) updated successfully`);
+    res.send(`${updateResult.rowCount} rows updated`);
   } catch (err) {
     console.error("Error executing updating allowed pincodes query", err.stack);
     res.status(500).send("Internal Server Error");
