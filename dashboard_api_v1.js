@@ -264,8 +264,8 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1 AND city_id = $2";
-    const valuesDuplicateCheck = [pincode, city_id];
+      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1";
+    const valuesDuplicateCheck = [pincode];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
