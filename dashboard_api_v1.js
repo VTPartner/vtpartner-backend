@@ -6,6 +6,25 @@ const db = require("./db"); // Import the database functions
 
 const router = express.Router();
 
+//To Handle Query Errors
+const handleError = (res, err) => {
+  console.error("Error executing query", err.stack);
+  if (err.message === "No Data Found") {
+    sendResponse(res, 404, null, "No Data Found");
+  } else {
+    sendResponse(res, 500, null, "Internal Server Error");
+  }
+};
+
+//Generic Response Function
+const sendResponse = (res, statusCode, data = null, message = null) => {
+  res.status(statusCode).send({
+    success: statusCode < 400,
+    message: message || (data ? "Request successful" : "No data found"),
+    data,
+  });
+};
+
 // Utility function to validate required fields
 const checkMissingFields = (requiredFields) => {
   const missingFields = Object.keys(requiredFields).filter(
@@ -220,23 +239,21 @@ router.post("/all_allowed_pincodes", verifyToken, async (req, res) => {
 
   try {
     const query =
-      "select pincode_id,allowed_pincodes_tbl.pincode,creation_time,allowed_pincodes_tbl.status from vtpartner.allowed_pincodes_tbl,vtpartner.available_citys_tbl where available_citys_tbl.city_id=allowed_pincodes_tbl.city_id and allowed_pincodes_tbl.city_id=$1 order by pincode_id desc";
+      "SELECT pincode_id, allowed_pincodes_tbl.pincode, creation_time, allowed_pincodes_tbl.status " +
+      "FROM vtpartner.allowed_pincodes_tbl, vtpartner.available_citys_tbl " +
+      "WHERE available_citys_tbl.city_id = allowed_pincodes_tbl.city_id AND allowed_pincodes_tbl.city_id = $1 " +
+      "ORDER BY pincode_id DESC";
+
     const values = [city_id];
-    console.log("query==>", query);
     const result = await db.selectQuery(query, values);
 
     if (result.length === 0) {
-      return res.status(404).send({ message: "No Data Found" });
+      return sendResponse(res, 404, null, "No Data Found");
     }
 
-    res.status(200).send({
-      pincodes: result,
-    });
+    sendResponse(res, 200, result);
   } catch (err) {
-    console.error("Error executing query", err.stack);
-    if (err.message === "No Data Found")
-      res.status(404).send({ message: "No Data Found" });
-    else res.status(500).send({ message: "Internal Server Error" });
+    handleError(res, err);
   }
 });
 
@@ -260,6 +277,10 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
+
+    const duplicateCheckQuery =
+      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1 ";
+    const duplicateCheckQueryValues = [pincode];
 
     const query =
       "INSERT INTO vtpartner.allowed_pincodes_tbl (pincode,city_id,status) VALUES ($1,$2,$3)";
