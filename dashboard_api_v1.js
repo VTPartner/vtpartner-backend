@@ -274,7 +274,7 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
 
     // Check if the result is greater than 0 to determine if the pincode already exists
     if (result.length > 0 && result[0].count > 0) {
-      return res.status(400).send({ message: "Pincode already exists" });
+      return res.status(409).send({ message: "Pincode already exists" });
     }
 
     // If pincode is not duplicate, proceed to insert
@@ -284,7 +284,7 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
     const rowCount = await db.insertQuery(query, values);
 
     // Send success response
-    res.status(201).send({ message: `${rowCount} row(s) inserted` });
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
   } catch (err) {
     console.error("Error executing add new allowed pincodes query", err.stack);
     res
