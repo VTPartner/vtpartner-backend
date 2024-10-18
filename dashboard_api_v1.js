@@ -373,7 +373,7 @@ router.post("/vehicle_types", verifyToken, async (req, res) => {
 router.post("/all_vehicles", verifyToken, async (req, res) => {
   try {
     const query =
-      "select vehicle_id,vehicle_name,weight,vehiclestbl.vehicle_type_id,description,image as vehicle_image,size_image as vehicle_size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id order by vehicle_id desc";
+      "select vehicle_id,vehicle_name,weight,vehiclestbl.vehicle_type_name,description,image as vehicle_image,size_image as vehicle_size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id order by vehicle_id desc";
     const values = [];
 
     const result = await db.selectQuery(query);
