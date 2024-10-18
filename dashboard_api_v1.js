@@ -316,6 +316,21 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
       });
     }
 
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.allowed_pincodes_tbl WHERE pincode ILIKE $1 AND city_id = $2";
+    const valuesDuplicateCheck = [pincode, city_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Pincode already exists" });
+    }
+
     const query =
       "UPDATE vtpartner.allowed_pincodes_tbl set pincode = $1,city_id =$2, status= $3 where pincode_id= $4";
     const values = [pincode, city_id, pincode_status, pincode_id];
