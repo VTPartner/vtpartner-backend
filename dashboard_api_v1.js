@@ -347,6 +347,52 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/vehicle_types", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select vehicle_type_id,vehicle_type_name from vtpartner.vehicle_types_tbl";
+    const values = [];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      vehicle_type_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/all_vehicles", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select vehicle_id,vehicle_name,weight,vehiclestbl.vehicle_type_id,description,image as vehicle_image,size_image as vehicle_size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id order by vehicle_id desc";
+    const values = [];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      vehicle_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 
 
 
