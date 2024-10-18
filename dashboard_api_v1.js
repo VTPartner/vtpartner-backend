@@ -140,7 +140,7 @@ router.post("/update_allowed_city", verifyToken, async (req, res) => {
       bg_image,
       status,
     } = req.body;
-    console.log("Update query Body::", req.body);
+
     // List of required fields
     const requiredFields = {
       city_id,
@@ -293,7 +293,6 @@ router.post("/add_new_pincode", verifyToken, async (req, res) => {
   }
 });
 
-
 router.post("/edit_pincode", verifyToken, async (req, res) => {
   try {
     const { city_id, pincode, pincode_status, pincode_id } = req.body;
@@ -332,7 +331,7 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
     }
 
     const query =
-      "UPDATE vtpartner.allowed_pincodes_tbl SET pincode = $1, city_id = $2, status = $3 WHERE pincode_id = $4";
+      "UPDATE vtpartner.allowed_pincodes_tbl SET pincode = $1, city_id = $2, status = $3 ,creation_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) WHERE pincode_id = $4";
     const values = [pincode, city_id, pincode_status, pincode_id];
     const rowCount = await db.updateQuery(query, values);
 
