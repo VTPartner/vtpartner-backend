@@ -79,6 +79,7 @@ app.post("/upload", (req, res) => {
 
     // Check if file is uploaded
     if (!req.file) {
+      console.log("No file uploaded::", !req.file);
       return res.status(400).send("No file uploaded.");
     }
 
