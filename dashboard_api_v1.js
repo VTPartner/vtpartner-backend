@@ -461,6 +461,77 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
 });
 
 
+router.post("/edit_vehicle", verifyToken, async (req, res) => {
+  try {
+    const {
+      vehicle_id,
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      vehicle_id,
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1";
+    const valuesDuplicateCheck = [vehicle_name];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Vehicle Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE  vtpartner.vehiclestbl SET vehicle_name =$1,weight=$2,vehicle_type_id=$3,description=$4,image=$5,size_image =%6 where vehicle_id=$7";
+    const values = [
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+      vehicle_id,
+    ];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating vehicle query", err.stack);
+    res.status(500).send({ message: "Error executing updating vehicle query" });
+  }
+});
+
+
 
 
   
