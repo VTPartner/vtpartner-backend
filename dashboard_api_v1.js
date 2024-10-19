@@ -642,6 +642,13 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
   } catch (err) {
 
     if (err.message.includes("No Data Found") || err.code === 404) {
+      const {
+        city_id,
+        vehicle_id,
+        starting_price_km,
+        minimum_time,
+        price_type_id,
+      } = req.body;
       // Assuming 'not found' is part of your error message indicating a missing resource
       try {
         // Proceed to insert the new price since the resource wasn't found
