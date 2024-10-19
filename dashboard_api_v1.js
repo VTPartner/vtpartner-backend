@@ -593,6 +593,140 @@ router.post("/vehicle_price_types", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/add_vehicle_price", verifyToken, async (req, res) => {
+  try {
+    const {
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "select city_name from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2";
+    const valuesDuplicateCheck = [city_id, vehicle_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "City Name already exists" });
+    }
+
+    // If City ID is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.vehicle_city_wise_price_tbl (city_id,vehicle_id,starting_price_per_km,minimum_time,price_type_id) VALUES ($1, $2, $3,$4,$5)";
+    const values = [
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+    ];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new price to vehicle query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new price to vehicle query" });
+  }
+});
+
+router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
+  try {
+    const {
+      price_id,
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "select city_name from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_id !=$3";
+    const valuesDuplicateCheck = [city_id, vehicle_id, price_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "City Name already exists" });
+    }
+
+    // If City ID is not duplicate, proceed to insert
+    const query =
+      "UPDATE vtpartner.vehicle_city_wise_price_tbl SET city_id=$1,vehicle_id=$2,starting_price_per_km=$3,minimum_time=$4,price_type_id=$5 where price_id=$6)";
+    const values = [
+      city_id,
+      vehicle_id,
+      starting_price_km,
+      minimum_time,
+      price_type_id,
+      price_id,
+    ];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new price to vehicle query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new price to vehicle query" });
+  }
+});
+
 
 
   
