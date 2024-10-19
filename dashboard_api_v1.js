@@ -532,12 +532,10 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
 router.post("/vehicle_prices", verifyToken, async (req, res) => {
   try {
-    const { vehicle_id } = req.body;
+    const { vehicle_id, limit = 25, offset = 0 } = req.body;
 
     // List of required fields
-    const requiredFields = {
-      vehicle_id,
-    };
+    const requiredFields = { vehicle_id };
 
     // Use the utility function to check for missing fields
     const missingFields = checkMissingFields(requiredFields);
@@ -549,9 +547,24 @@ router.post("/vehicle_prices", verifyToken, async (req, res) => {
       });
     }
 
-    const query =
-      "select price_id,vehicle_city_wise_price_tbl.city_id,vehicle_city_wise_price_tbl.vehicle_id,starting_price_per_km,minimum_time,vehicle_city_wise_price_tbl.price_type_id,city_name,price_type,bg_image,time_created_at from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl,vtpartner.vehiclestbl,vtpartner.vehicle_price_type_tbl where vehicle_price_type_tbl.price_type_id=vehicle_city_wise_price_tbl.price_type_id and vehicle_city_wise_price_tbl.city_id=available_citys_tbl.city_id and vehicle_city_wise_price_tbl.vehicle_id=vehiclestbl.vehicle_id and vehicle_city_wise_price_tbl.vehicle_id=$1 order by price_id desc";
-    const values = [vehicle_id];
+    // Fetch total count of vehicle prices
+    const countQuery =
+      "select count(*) as total_count from vtpartner.vehicle_city_wise_price_tbl where vehicle_id = $1";
+    const countResult = await db.selectQuery(countQuery, [vehicle_id]);
+    const totalCount = countResult[0].total_count;
+
+    // Fetch the paginated vehicle prices
+    const query = `
+      select price_id, vehicle_city_wise_price_tbl.city_id, vehicle_city_wise_price_tbl.vehicle_id, starting_price_per_km, minimum_time, vehicle_city_wise_price_tbl.price_type_id, city_name, price_type, bg_image, time_created_at 
+      from vtpartner.available_citys_tbl, vtpartner.vehicle_city_wise_price_tbl, vtpartner.vehiclestbl, vtpartner.vehicle_price_type_tbl 
+      where vehicle_price_type_tbl.price_type_id = vehicle_city_wise_price_tbl.price_type_id 
+        and vehicle_city_wise_price_tbl.city_id = available_citys_tbl.city_id 
+        and vehicle_city_wise_price_tbl.vehicle_id = vehiclestbl.vehicle_id 
+        and vehicle_city_wise_price_tbl.vehicle_id = $1 
+      order by price_id desc 
+      limit $2 offset $3
+    `;
+    const values = [vehicle_id, limit, offset];
 
     const result = await db.selectQuery(query, values);
 
@@ -561,6 +574,7 @@ router.post("/vehicle_prices", verifyToken, async (req, res) => {
 
     res.status(200).send({
       vehicle_price_details: result,
+      total_count: totalCount, // Include total count in response
     });
   } catch (err) {
     console.error("Error executing vehicle_prices query", err.stack);
@@ -569,6 +583,7 @@ router.post("/vehicle_prices", verifyToken, async (req, res) => {
     else res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
 
 router.post("/vehicle_price_types", verifyToken, async (req, res) => {
   try {
