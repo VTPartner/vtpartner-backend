@@ -529,11 +529,28 @@ router.post("/vehicle_types", verifyToken, async (req, res) => {
 
 router.post("/all_vehicles", verifyToken, async (req, res) => {
   try {
-    const query =
-      "select vehicle_id,vehicle_name,weight,vehicle_types_tbl.vehicle_type_id,vehicle_types_tbl.vehicle_type_name,description,image,size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id order by vehicle_id desc";
-    const values = [];
+    const { category_id } = req.body;
 
-    const result = await db.selectQuery(query);
+    // List of required fields
+    const requiredFields = {
+      category_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "select vehicle_id,vehicle_name,weight,vehicle_types_tbl.vehicle_type_id,vehicle_types_tbl.vehicle_type_name,description,image,size_image from vtpartner.vehiclestbl,vtpartner.vehicle_types_tbl where vehiclestbl.vehicle_type_id=vehicle_types_tbl.vehicle_type_id and category_id=$1 order by vehicle_id desc";
+    const values = [category_id];
+
+    const result = await db.selectQuery(query, values);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
