@@ -446,7 +446,8 @@ router.post("/add_service", verifyToken, async (req, res) => {
 
 router.post("/edit_service", verifyToken, async (req, res) => {
   try {
-    const { category_name, category_type_id, category_image } = req.body;
+    const { category_id, category_name, category_type_id, category_image } =
+      req.body;
 
     // List of required fields
     const requiredFields = {
