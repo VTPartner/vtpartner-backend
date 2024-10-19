@@ -496,7 +496,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1 and vehicle_id !=$2";
+      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1 AND vehicle_id !=$2";
     const valuesDuplicateCheck = [vehicle_name, vehicle_id];
 
     const result = await db.selectQuery(
@@ -511,7 +511,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE  vtpartner.vehiclestbl SET vehicle_name =$1,weight=$2,vehicle_type_id=$3,description=$4,image=$5,size_image =%6 where vehicle_id=$7";
+      "UPDATE  vtpartner.vehiclestbl SET vehicle_name =$1,weight=$2,vehicle_type_id=$3,description=$4,image=$5,size_image =$6 where vehicle_id=$7";
     const values = [
       vehicle_name,
       weight,
