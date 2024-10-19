@@ -574,9 +574,9 @@ router.post("/vehicle_price_types", verifyToken, async (req, res) => {
   try {
     const query =
       "select price_type_id,price_type from vtpartner.vehicle_price_type_tbl";
-    const values = [vehicle_id];
+    const values = [];
 
-    const result = await db.selectQuery(query, values);
+    const result = await db.selectQuery(query);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
