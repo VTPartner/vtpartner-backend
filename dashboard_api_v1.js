@@ -351,7 +351,7 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
 router.post("/all_services", verifyToken, async (req, res) => {
   try {
     const query =
-      "select category_id,category_name,category_type_id,category_image,category_type from vtpartner.categorytbl,vtpartner.category_type_tbl where category_type_tbl.cat_type_id=categorytbl.category_type_id order by category_id desc";
+      "select category_id,category_name,category_type_id,category_image,category_type,epoch from vtpartner.categorytbl,vtpartner.category_type_tbl where category_type_tbl.cat_type_id=categorytbl.category_type_id order by category_id desc";
     const values = [];
 
     const result = await db.selectQuery(query);
@@ -424,7 +424,7 @@ router.post("/add_service", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/add_service", verifyToken, async (req, res) => {
+router.post("/edit_service", verifyToken, async (req, res) => {
   try {
     const { category_name, category_type_id, category_image, category_type } =
       req.body;
@@ -465,7 +465,7 @@ router.post("/add_service", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE vtpartner.categorytbl SET category_name=$1, category_type_id=$2, category_image=$3 where category_id=$4";
+      "UPDATE vtpartner.categorytbl SET category_name=$1, category_type_id=$2, category_image=$3,epoch=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where category_id=$4";
     const values = [
       category_name,
       category_type_id,
