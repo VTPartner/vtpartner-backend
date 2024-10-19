@@ -625,7 +625,7 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "select city_name from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_type_id=$3";
+      "select count(*) from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_type_id=$3";
     const valuesDuplicateCheck = [city_id, vehicle_id, price_type_id];
 
     const result = await db.selectQuery(
@@ -663,10 +663,7 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
         .status(500)
         .send({ message: "Error executing add new price to vehicle query" });
     }
-
-  
   } catch (err) {
-
     if (err.message.includes("No Data Found") || err.code === 404) {
       const {
         city_id,
@@ -740,7 +737,7 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "select city_name from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_id !=$3";
+      "select count(*) from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_id !=$3";
     const valuesDuplicateCheck = [city_id, vehicle_id, price_id];
 
     const result = await db.selectQuery(
@@ -768,7 +765,6 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
     // Send success response
     res.status(200).send({ message: `${rowCount} row(s) inserted` });
   } catch (err) {
-
     try {
       if (err.message.includes("No Data Found") || err.code === 404) {
         console.log("Do Update here");
