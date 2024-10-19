@@ -400,7 +400,6 @@ router.post("/add_service", verifyToken, async (req, res) => {
 
     // List of required fields
     const requiredFields = {
-      category_id,
       category_name,
       category_type_id,
       category_image,
