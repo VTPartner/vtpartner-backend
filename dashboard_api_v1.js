@@ -441,7 +441,7 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "INSERT INTO vtpartner.vehiclestbl (vehicle_name,weight,vehicle_type_id,description,image,size_image) VALUES ($1, $2, $3)";
+      "INSERT INTO vtpartner.vehiclestbl (vehicle_name,weight,vehicle_type_id,description,image,size_image) VALUES ($1, $2, $3,$4,$5,$6)";
     const values = [
       vehicle_name,
       weight,

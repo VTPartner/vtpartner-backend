@@ -62,7 +62,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   // limits: { fileSize: 1000000 }, // Optionally set limits
-}).single("cityImage");
+}).single("vtPartnerImage");
 
 // Handle file upload
 app.post("/upload", (req, res) => {
