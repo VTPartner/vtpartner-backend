@@ -641,32 +641,33 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
   
   } catch (err) {
 
-   if(err.stack.status === 404){
-     try {
-       // If City ID is not duplicate, proceed to insert
-       const query =
-         "INSERT INTO vtpartner.vehicle_city_wise_price_tbl (city_id,vehicle_id,starting_price_per_km,minimum_time,price_type_id) VALUES ($1, $2, $3,$4,$5)";
-       const values = [
-         city_id,
-         vehicle_id,
-         starting_price_km,
-         minimum_time,
-         price_type_id,
-       ];
-       const rowCount = await db.insertQuery(query, values);
+    if (err.message.includes("No Data Found") || err.code === 404) {
+      // Assuming 'not found' is part of your error message indicating a missing resource
+      try {
+        // Proceed to insert the new price since the resource wasn't found
+        const query =
+          "INSERT INTO vtpartner.vehicle_city_wise_price_tbl (city_id, vehicle_id, starting_price_per_km, minimum_time, price_type_id) VALUES ($1, $2, $3, $4, $5)";
+        const values = [
+          city_id,
+          vehicle_id,
+          starting_price_km,
+          minimum_time,
+          price_type_id,
+        ];
+        const rowCount = await db.insertQuery(query, values);
 
-       // Send success response
-       res.status(200).send({ message: `${rowCount} row(s) inserted` });
-     } catch (error) {
-       console.error(
-         "Error executing add new price to vehicle query",
-         err.stack
-       );
-       res
-         .status(500)
-         .send({ message: "Error executing add new price to vehicle query" });
-     }
-   }
+        // Send success response for insertion
+        return res.status(200).send({ message: `${rowCount} row(s) inserted` });
+      } catch (insertError) {
+        console.error(
+          "Error executing add new price to vehicle query",
+          insertError.stack
+        );
+        return res
+          .status(500)
+          .send({ message: "Error executing add new price to vehicle query" });
+      }
+    }
     console.error("Error executing add new price to vehicle query", err.stack);
     res
       .status(500)
