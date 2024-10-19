@@ -87,6 +87,7 @@ app.post("/upload", (req, res) => {
 
       // Return the full image URL under your domain
       const imageUrl = `https://vtpartner.org/uploads/${req.file.filename}`;
+      console.log("Uploaded ImageUrl::", imageUrl);
       res.status(200).json({ imageUrl });
     } catch (moveError) {
       console.error("Error moving file:", moveError);
