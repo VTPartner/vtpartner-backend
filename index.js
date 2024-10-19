@@ -68,7 +68,7 @@ const upload = multer({
 app.post("/upload", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      console.log("Error::", err);
+      console.log("Error Uploading Image::", err);
       return res.status(500).send("Error uploading file.");
     }
 
