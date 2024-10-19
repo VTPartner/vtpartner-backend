@@ -347,6 +347,143 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
   }
 });
 
+
+router.post("/all_services", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select category_id,category_name,category_type_id,category_image,category_type from vtpartner.categorytbl,vtpartner.category_type_tbl where category_type_tbl.cat_type_id=categorytbl.category_type_id order by category_id desc";
+    const values = [];
+
+    const result = await db.selectQuery(query);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      category_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/add_service", verifyToken, async (req, res) => {
+  try {
+    const { category_name, category_type_id, category_image, category_type } =
+      req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      category_name,
+      category_type_id,
+      category_image,
+      category_type,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.categorytbl WHERE category_name ILIKE $1";
+    const valuesDuplicateCheck = [category_name];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Service Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.categorytbl (category_name, category_type_id, category_image) VALUES ($1, $2, $3)";
+    const values = [category_name, category_type_id, category_image];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new category query", err.stack);
+    res.status(500).send({ message: "Error executing add new category query" });
+  }
+});
+
+router.post("/add_service", verifyToken, async (req, res) => {
+  try {
+    const { category_name, category_type_id, category_image, category_type } =
+      req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      category_name,
+      category_type_id,
+      category_image,
+      category_type,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.categorytbl WHERE category_name ILIKE $1 AND category_id!=$2";
+    const valuesDuplicateCheck = [category_name, category_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Service Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE vtpartner.categorytbl SET category_name=$1, category_type_id=$2, category_image=$3 where category_id=$4";
+    const values = [
+      category_name,
+      category_type_id,
+      category_image,
+      category_id,
+    ];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating category query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing updating category query" });
+  }
+});
+
 router.post("/vehicle_types", verifyToken, async (req, res) => {
   try {
     const query =
