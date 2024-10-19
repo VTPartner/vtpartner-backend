@@ -58,22 +58,14 @@ const storage = multer.diskStorage({
   },
 });
 
-// const upload = multer({
-//   storage: storage,
-//   // limits: { fileSize: 1000000 }, // Optionally set limits
-// }).single("cityImage");
-
-
 // Init upload
 const upload = multer({
   storage: storage,
-  // Optionally set file size limits
-  // limits: { fileSize: 1000000 },
-}).any();
+  // limits: { fileSize: 1000000 }, // Optionally set limits
+}).single("cityImage");
 
 // Handle file upload
 app.post("/upload", (req, res) => {
-  console.log(req.body);
   upload(req, res, async (err) => {
     if (err) {
       console.log("Error Uploading Image::", err);
@@ -82,7 +74,6 @@ app.post("/upload", (req, res) => {
 
     // Check if file is uploaded
     if (!req.file) {
-      console.log("No file uploaded::", !req.file);
       return res.status(400).send("No file uploaded.");
     }
 
