@@ -17,6 +17,7 @@ const pool = new Pool({
 async function selectQuery(query, params = []) {
   try {
     console.log("Select_Query::=>", query);
+    console.log("Params::", params);
     const result = await pool.query(query, params);
     if (result.rows.length === 0) {
       throw new Error("No Data Found");
