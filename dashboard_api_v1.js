@@ -742,7 +742,7 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
       } = req.body;
       // If City ID is not duplicate, proceed to insert
       const query =
-        "UPDATE vtpartner.vehicle_city_wise_price_tbl SET city_id=$1,vehicle_id=$2,starting_price_per_km=$3,minimum_time=$4,price_type_id=$5 where price_id=$6";
+        "UPDATE vtpartner.vehicle_city_wise_price_tbl SET city_id=$1,vehicle_id=$2,starting_price_per_km=$3,minimum_time=$4,price_type_id=$5,time_created_at= EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where price_id=$6";
       const values = [
         city_id,
         vehicle_id,
