@@ -553,6 +553,7 @@ router.post("/all_vehicles", verifyToken, async (req, res) => {
 router.post("/add_vehicle", verifyToken, async (req, res) => {
   try {
     const {
+      category_id,
       vehicle_name,
       weight,
       vehicle_type_id,
@@ -563,6 +564,7 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
 
     // List of required fields
     const requiredFields = {
+      category_id,
       vehicle_name,
       weight,
       vehicle_type_id,
@@ -598,7 +600,7 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "INSERT INTO vtpartner.vehiclestbl (vehicle_name,weight,vehicle_type_id,description,image,size_image) VALUES ($1, $2, $3,$4,$5,$6)";
+      "INSERT INTO vtpartner.vehiclestbl (vehicle_name,weight,vehicle_type_id,description,image,size_image,category_id) VALUES ($1, $2, $3,$4,$5,$6,$7)";
     const values = [
       vehicle_name,
       weight,
@@ -606,6 +608,7 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
       description,
       image,
       size_image,
+      category_id,
     ];
     const rowCount = await db.insertQuery(query, values);
 
@@ -620,6 +623,7 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
 router.post("/edit_vehicle", verifyToken, async (req, res) => {
   try {
     const {
+      category_id,
       vehicle_id,
       vehicle_name,
       weight,
@@ -631,6 +635,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
     // List of required fields
     const requiredFields = {
+      category_id,
       vehicle_id,
       vehicle_name,
       weight,
@@ -667,7 +672,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE  vtpartner.vehiclestbl SET vehicle_name =$1,weight=$2,vehicle_type_id=$3,description=$4,image=$5,size_image =$6 where vehicle_id=$7";
+      "UPDATE  vtpartner.vehiclestbl SET vehicle_name =$1,weight=$2,vehicle_type_id=$3,description=$4,image=$5,size_image =$6,category_id=$8 where vehicle_id=$7";
     const values = [
       vehicle_name,
       weight,
@@ -676,6 +681,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
       image,
       size_image,
       vehicle_id,
+      category_id,
     ];
     const rowCount = await db.updateQuery(query, values);
 
