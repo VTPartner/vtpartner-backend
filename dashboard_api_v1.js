@@ -381,7 +381,7 @@ router.post("/all_vehicles", verifyToken, async (req, res) => {
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
     }
-    console.log(result);
+
     res.status(200).send({
       vehicle_details: result,
     });
