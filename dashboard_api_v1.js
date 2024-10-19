@@ -496,8 +496,8 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1";
-    const valuesDuplicateCheck = [vehicle_name];
+      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1 and vehicle_id !=$2";
+    const valuesDuplicateCheck = [vehicle_name, vehicle_id];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
