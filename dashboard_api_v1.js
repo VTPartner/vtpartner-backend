@@ -570,6 +570,29 @@ router.post("/vehicle_prices", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/vehicle_price_types", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select price_type_id,price_type from vtpartner.vehicle_price_type_tbl";
+    const values = [vehicle_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      vehicle_price_types: result,
+    });
+  } catch (err) {
+    console.error("Error executing vehicle_price_types query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 
 
   
