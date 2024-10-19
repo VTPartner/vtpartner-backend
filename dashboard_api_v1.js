@@ -348,6 +348,29 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
 });
 
 
+router.post("/service_types", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select cat_type_id,category_type from vtpartner.category_type_tbl";
+    const values = [];
+
+    const result = await db.selectQuery(query);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      services_type_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 router.post("/all_services", verifyToken, async (req, res) => {
   try {
     const query =
@@ -361,7 +384,7 @@ router.post("/all_services", verifyToken, async (req, res) => {
     }
 
     res.status(200).send({
-      category_details: result,
+      services_details: result,
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
@@ -373,8 +396,7 @@ router.post("/all_services", verifyToken, async (req, res) => {
 
 router.post("/add_service", verifyToken, async (req, res) => {
   try {
-    const { category_name, category_type_id, category_image, category_type } =
-      req.body;
+    const { category_name, category_type_id, category_image } = req.body;
 
     // List of required fields
     const requiredFields = {
@@ -382,7 +404,6 @@ router.post("/add_service", verifyToken, async (req, res) => {
       category_name,
       category_type_id,
       category_image,
-      category_type,
     };
 
     // Use the utility function to check for missing fields
@@ -426,8 +447,7 @@ router.post("/add_service", verifyToken, async (req, res) => {
 
 router.post("/edit_service", verifyToken, async (req, res) => {
   try {
-    const { category_name, category_type_id, category_image, category_type } =
-      req.body;
+    const { category_name, category_type_id, category_image } = req.body;
 
     // List of required fields
     const requiredFields = {
@@ -435,7 +455,6 @@ router.post("/edit_service", verifyToken, async (req, res) => {
       category_name,
       category_type_id,
       category_image,
-      category_type,
     };
 
     // Use the utility function to check for missing fields
