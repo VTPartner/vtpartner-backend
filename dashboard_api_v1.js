@@ -737,8 +737,8 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
 
     // Validating to avoid duplication
     const queryDuplicateCheck =
-      "select count(*) from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_id !=$3";
-    const valuesDuplicateCheck = [city_id, vehicle_id, price_id];
+      "select count(*) from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl where available_citys_tbl.city_id=vehicle_city_wise_price_tbl.city_id and available_citys_tbl.city_id=$1 and vehicle_id=$2 and price_id !=$3 and and price_type_id!=$4";
+    const valuesDuplicateCheck = [city_id, vehicle_id, price_id, price_type_id];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
