@@ -635,6 +635,7 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
 
     // Check if the result is greater than 0 to determine if the pincode already exists
     if (result.length > 0 && result[0].count > 0) {
+      console.log("City Name already exists");
       return res.status(409).send({ message: "City Name already exists" });
     }
 
