@@ -532,7 +532,7 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
 
 router.post("/vehicle_prices", verifyToken, async (req, res) => {
   try {
-    const { vehicle_id, limit = 25, offset = 0 } = req.body;
+    const { vehicle_id, limit = 5, offset = 0 } = req.body;
 
     // List of required fields
     const requiredFields = { vehicle_id };
