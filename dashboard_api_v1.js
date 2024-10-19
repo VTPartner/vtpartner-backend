@@ -638,6 +638,31 @@ router.post("/add_vehicle_price", verifyToken, async (req, res) => {
       return res.status(409).send({ message: "City Name already exists" });
     }
 
+    try {
+      // Proceed to insert the new price since the resource wasn't found
+      const query =
+        "INSERT INTO vtpartner.vehicle_city_wise_price_tbl (city_id, vehicle_id, starting_price_per_km, minimum_time, price_type_id) VALUES ($1, $2, $3, $4, $5)";
+      const values = [
+        city_id,
+        vehicle_id,
+        starting_price_km,
+        minimum_time,
+        price_type_id,
+      ];
+      const rowCount = await db.insertQuery(query, values);
+
+      // Send success response for insertion
+      return res.status(200).send({ message: `${rowCount} row(s) inserted` });
+    } catch (insertError) {
+      console.error(
+        "Error executing add new price to vehicle query",
+        insertError.stack
+      );
+      return res
+        .status(500)
+        .send({ message: "Error executing add new price to vehicle query" });
+    }
+
   
   } catch (err) {
 
