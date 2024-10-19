@@ -460,7 +460,6 @@ router.post("/add_vehicle", verifyToken, async (req, res) => {
   }
 });
 
-
 router.post("/edit_vehicle", verifyToken, async (req, res) => {
   try {
     const {
@@ -531,6 +530,28 @@ router.post("/edit_vehicle", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/vehicle_prices", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select price_id,vehicle_city_wise_price_tbl.city_id,vehicle_city_wise_price_tbl.vehicle_id,starting_price_per_km,minimum_time,vehicle_city_wise_price_tbl.price_type_id,city_name,price_type,bg_image from vtpartner.available_citys_tbl,vtpartner.vehicle_city_wise_price_tbl,vtpartner.vehiclestbl,vtpartner.vehicle_price_type_tbl where vehicle_price_type_tbl.price_type_id=vehicle_city_wise_price_tbl.price_type_id and vehicle_city_wise_price_tbl.city_id=available_citys_tbl.city_id and vehicle_city_wise_price_tbl.vehicle_id=vehiclestbl.vehicle_id and vehicle_city_wise_price_tbl.vehicle_id=$1 order by city_name";
+    const values = [vehicle_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      vehicle_price_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing vehicle_prices query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 
 
