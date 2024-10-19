@@ -745,29 +745,7 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
   } catch (err) {
 
     if (err.message.includes("No Data Found") || err.code === 404) {
-      const {
-        price_id,
-        city_id,
-        vehicle_id,
-        starting_price_km,
-        minimum_time,
-        price_type_id,
-      } = req.body;
-      // If City ID is not duplicate, proceed to insert
-      const query =
-        "UPDATE vtpartner.vehicle_city_wise_price_tbl SET city_id=$1,vehicle_id=$2,starting_price_per_km=$3,minimum_time=$4,price_type_id=$5 where price_id=$6)";
-      const values = [
-        city_id,
-        vehicle_id,
-        starting_price_km,
-        minimum_time,
-        price_type_id,
-        price_id,
-      ];
-      const rowCount = await db.updateQuery(query, values);
-
-      // Send success response
-      res.status(200).send({ message: `${rowCount} row(s) inserted` });
+      console.log("Do Update here");
     }
     console.error("Error executing add new price to vehicle query", err.stack);
     res
