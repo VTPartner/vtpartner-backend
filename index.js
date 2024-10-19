@@ -61,8 +61,13 @@ const storage = multer.diskStorage({
 // Init upload
 const upload = multer({
   storage: storage,
-  // limits: { fileSize: 1000000 }, // Optionally set limits
-}).single("cityImage");
+  // Optionally set file size limits
+  // limits: { fileSize: 1000000 },
+}).fields([
+  { name: "cityImage", maxCount: 1 },
+  { name: "vehicleImage", maxCount: 1 },
+  { name: "vehicleSizeImage", maxCount: 1 },
+]);
 
 // Handle file upload
 app.post("/upload", (req, res) => {
