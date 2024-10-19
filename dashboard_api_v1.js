@@ -393,6 +393,73 @@ router.post("/all_vehicles", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/add_vehicle", verifyToken, async (req, res) => {
+  try {
+    const {
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.vehiclestbl WHERE vehicle_name ILIKE $1";
+    const valuesDuplicateCheck = [pincode];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Vehicle Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.vehiclestbl (vehicle_name,weight,vehicle_type_id,description,image,size_image) VALUES ($1, $2, $3)";
+    const values = [
+      vehicle_name,
+      weight,
+      vehicle_type_id,
+      description,
+      image,
+      size_image,
+    ];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new vehicle query", err.stack);
+    res.status(500).send({ message: "Error executing add new vehicle query" });
+  }
+});
+
 
 
 
