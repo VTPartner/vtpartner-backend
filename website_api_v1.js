@@ -40,7 +40,7 @@ router.post("/all_services", async (req, res) => {
   }
 });
 
-router.post("/all_allowed_cities", verifyToken, async (req, res) => {
+router.post("/all_allowed_cities", async (req, res) => {
   const { city_id } = req.body;
 
   try {
