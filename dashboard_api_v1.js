@@ -1274,7 +1274,7 @@ router.post("/edit_other_service", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE  vtpartner.other_servicestbl SET service_name=$1,sub_cat_id=$1,service_image=$1 where service_id=$4";
+      "UPDATE  vtpartner.other_servicestbl SET service_name=$1,sub_cat_id=$2,service_image=$3 where service_id=$4";
     const values = [service_name, sub_cat_id, service_image, service_id];
     const rowCount = await db.updateQuery(query, values);
 
