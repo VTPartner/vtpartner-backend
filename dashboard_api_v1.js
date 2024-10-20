@@ -1234,7 +1234,7 @@ router.post("/add_other_service", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/edit_other_services", verifyToken, async (req, res) => {
+router.post("/edit_other_service", verifyToken, async (req, res) => {
   try {
     const { service_id, service_name, sub_cat_id, service_image } = req.body;
 
