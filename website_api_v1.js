@@ -45,7 +45,7 @@ router.post("/all_allowed_cities", async (req, res) => {
 
   try {
     const result = await db.selectQuery(
-      "select city_id,city_name,pincode,bg_image,time,pincode_until,description,status from vtpartner.available_citys_tbl order by city_id desc"
+      "select city_id,city_name,pincode,bg_image,time,pincode_until,description,status from vtpartner.available_citys_tbl order by city_id"
       // [admin_id]
     );
 
