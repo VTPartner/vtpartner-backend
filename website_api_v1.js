@@ -20,7 +20,7 @@ const checkMissingFields = (requiredFields) => {
 router.post("/all_services", async (req, res) => {
   try {
     const query =
-      "select category_id,category_name,category_type_id,category_image,category_type,epoch from vtpartner.categorytbl,vtpartner.category_type_tbl where category_type_tbl.cat_type_id=categorytbl.category_type_id order by category_id desc";
+      "select category_id,category_name,category_type_id,category_image,category_type,epoch from vtpartner.categorytbl,vtpartner.category_type_tbl where category_type_tbl.cat_type_id=categorytbl.category_type_id order by category_id asc";
     const values = [];
 
     const result = await db.selectQuery(query);
