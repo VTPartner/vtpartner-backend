@@ -40,4 +40,28 @@ router.post("/all_services", async (req, res) => {
   }
 });
 
+router.post("/all_allowed_cities", verifyToken, async (req, res) => {
+  const { city_id } = req.body;
+
+  try {
+    const result = await db.selectQuery(
+      "select city_id,city_name,pincode,bg_image ad imageUrl,time,pincode_until,description,status from vtpartner.available_citys_tbl order by city_id desc"
+      // [admin_id]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      cities: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
