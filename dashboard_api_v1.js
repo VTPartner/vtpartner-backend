@@ -1032,15 +1032,13 @@ router.post("/all_sub_categories", verifyToken, async (req, res) => {
 
 router.post("/add_sub_category", verifyToken, async (req, res) => {
   try {
-    const {
-      category_id,
-      sub_cat_name,cat_id,image
-    } = req.body;
+    const { category_id, sub_cat_name, image } = req.body;
 
     // List of required fields
     const requiredFields = {
       category_id,
-      sub_cat_name,cat_id,image
+      sub_cat_name,
+      image,
     };
 
     // Use the utility function to check for missing fields
@@ -1056,7 +1054,7 @@ router.post("/add_sub_category", verifyToken, async (req, res) => {
     // Validating to avoid duplication
     const queryDuplicateCheck =
       "SELECT COUNT(*) FROM vtpartner.sub_categorytbl WHERE sub_cat_name ILIKE $1 AND cat_id=$2";
-    const valuesDuplicateCheck = [sub_cat_name,category_id];
+    const valuesDuplicateCheck = [sub_cat_name, category_id];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
@@ -1065,38 +1063,37 @@ router.post("/add_sub_category", verifyToken, async (req, res) => {
 
     // Check if the result is greater than 0 to determine if the pincode already exists
     if (result.length > 0 && result[0].count > 0) {
-      return res.status(409).send({ message: "Sub Category Name already exists" });
+      return res
+        .status(409)
+        .send({ message: "Sub Category Name already exists" });
     }
 
     // If pincode is not duplicate, proceed to insert
     const query =
       "INSERT INTO vtpartner.sub_categorytbl (sub_cat_name,cat_id,image) VALUES ($1, $2, $3)";
-    const values = [
-      sub_cat_name,cat_id,image
-    ];
+    const values = [sub_cat_name, category_id, image];
     const rowCount = await db.insertQuery(query, values);
 
     // Send success response
     res.status(200).send({ message: `${rowCount} row(s) inserted` });
   } catch (err) {
-    console.error("Error executing add new vehicle query", err.stack);
-    res.status(500).send({ message: "Error executing add new vehicle query" });
+    console.error("Error executing add new sub category query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new sub category query" });
   }
 });
 
 router.post("/edit_sub_category", verifyToken, async (req, res) => {
   try {
-    const {
-      category_id,
-      sub_cat_id,
-      sub_cat_name,cat_id,image
-    } = req.body;
+    const { category_id, sub_cat_id, sub_cat_name, image } = req.body;
 
     // List of required fields
     const requiredFields = {
       category_id,
       sub_cat_id,
-      sub_cat_name,cat_id,image
+      sub_cat_name,
+      image,
     };
 
     // Use the utility function to check for missing fields
@@ -1112,7 +1109,7 @@ router.post("/edit_sub_category", verifyToken, async (req, res) => {
     // Validating to avoid duplication
     const queryDuplicateCheck =
       "SELECT COUNT(*) FROM vtpartner.sub_categorytbl WHERE sub_cat_name ILIKE $1 AND sub_cat_id !=$2";
-    const valuesDuplicateCheck = [vehicle_name, vehicle_id];
+    const valuesDuplicateCheck = [sub_cat_name, sub_cat_id];
 
     const result = await db.selectQuery(
       queryDuplicateCheck,
@@ -1121,22 +1118,24 @@ router.post("/edit_sub_category", verifyToken, async (req, res) => {
 
     // Check if the result is greater than 0 to determine if the pincode already exists
     if (result.length > 0 && result[0].count > 0) {
-      return res.status(409).send({ message: "Sub Category Name already exists" });
+      return res
+        .status(409)
+        .send({ message: "Sub Category Name already exists" });
     }
 
     // If pincode is not duplicate, proceed to insert
     const query =
       "UPDATE  vtpartner.sub_categorytbl SET sub_cat_name=$1,cat_id=$2,image=$3 where sub_cat_id=$4";
-    const values = [
-      sub_cat_name,cat_id,image,sub_cat_id
-    ];
+    const values = [sub_cat_name, category_id, image, sub_cat_id];
     const rowCount = await db.updateQuery(query, values);
 
     // Send success response
     res.status(200).send({ message: `${rowCount} row(s) inserted` });
   } catch (err) {
-    console.error("Error executing updating vehicle query", err.stack);
-    res.status(500).send({ message: "Error executing updating vehicle query" });
+    console.error("Error executing updating sub category query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing updating sub category query" });
   }
 });
 
