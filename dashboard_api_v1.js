@@ -1126,7 +1126,7 @@ router.post("/edit_sub_category", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE  vtpartner.sub_categorytbl SET sub_cat_name=$1,cat_id=$2,image=$3 where sub_cat_id=$4";
+      "UPDATE  vtpartner.sub_categorytbl SET sub_cat_name=$1,cat_id=$2,image=$3,epoch_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where sub_cat_id=$4";
     const values = [sub_cat_name, category_id, image, sub_cat_id];
     const rowCount = await db.updateQuery(query, values);
 
@@ -1274,7 +1274,7 @@ router.post("/edit_other_service", verifyToken, async (req, res) => {
 
     // If pincode is not duplicate, proceed to insert
     const query =
-      "UPDATE  vtpartner.other_servicestbl SET service_name=$1,sub_cat_id=$2,service_image=$3 where service_id=$4";
+      "UPDATE  vtpartner.other_servicestbl SET service_name=$1,sub_cat_id=$2,service_image=$3,time_updated=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where service_id=$4";
     const values = [service_name, sub_cat_id, service_image, service_id];
     const rowCount = await db.updateQuery(query, values);
 
