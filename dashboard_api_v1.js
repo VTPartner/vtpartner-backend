@@ -1046,6 +1046,7 @@ router.post("/add_sub_category", verifyToken, async (req, res) => {
 
     // If there are missing fields, return an error response
     if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
       return res.status(400).send({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
