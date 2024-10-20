@@ -989,8 +989,346 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
   }
 });
 
+//All Sub categories [ Electrician , plumber , JCb Driver ] against category_id 
+router.post("/all_sub_categories", verifyToken, async (req, res) => {
+  try {
+    const { category_id } = req.body;
 
+    // List of required fields
+    const requiredFields = {
+      category_id,
+    };
 
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "select sub_cat_id,sub_cat_name,cat_id,image,epoch_time from vtpartner.sub_categorytbl where cat_id=$1 order by sub_cat_id desc";
+    const values = [category_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      sub_categories_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/add_sub_category", verifyToken, async (req, res) => {
+  try {
+    const {
+      category_id,
+      sub_cat_name,cat_id,image
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      sub_cat_name,cat_id,image
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.sub_categorytbl WHERE sub_cat_name ILIKE $1 AND cat_id=$2";
+    const valuesDuplicateCheck = [sub_cat_name,category_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Sub Category Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.sub_categorytbl (sub_cat_name,cat_id,image) VALUES ($1, $2, $3)";
+    const values = [
+      sub_cat_name,cat_id,image
+    ];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new vehicle query", err.stack);
+    res.status(500).send({ message: "Error executing add new vehicle query" });
+  }
+});
+
+router.post("/edit_sub_category", verifyToken, async (req, res) => {
+  try {
+    const {
+      category_id,
+      sub_cat_id,
+      sub_cat_name,cat_id,image
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      sub_cat_id,
+      sub_cat_name,cat_id,image
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.sub_categorytbl WHERE sub_cat_name ILIKE $1 AND sub_cat_id !=$2";
+    const valuesDuplicateCheck = [vehicle_name, vehicle_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Sub Category Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE  vtpartner.sub_categorytbl SET sub_cat_name=$1,cat_id=$2,image=$3 where sub_cat_id=$4";
+    const values = [
+      sub_cat_name,cat_id,image,sub_cat_id
+    ];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating vehicle query", err.stack);
+    res.status(500).send({ message: "Error executing updating vehicle query" });
+  }
+});
+
+//Other Services [ WireMan,etc ]
+router.post("/all_other_services", verifyToken, async (req, res) => {
+  try {
+    const { sub_cat_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      sub_cat_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "select service_id,service_name,sub_cat_id,service_image,time_updated from vtpartner.other_servicestbl where sub_cat_id=$1 order by sub_cat_id desc";
+    const values = [sub_cat_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      other_services_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/add_other_service", verifyToken, async (req, res) => {
+  try {
+    const { service_name, sub_cat_id, service_image } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      service_name,
+      sub_cat_id,
+      service_image,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.other_servicestbl WHERE service_name ILIKE $1 AND sub_cat_id=$2";
+    const valuesDuplicateCheck = [service_name, sub_cat_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res.status(409).send({ message: "Service Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.other_servicestbl (service_name,sub_cat_id,service_image) VALUES ($1, $2, $3)";
+    const values = [service_name, sub_cat_id, service_image];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new other Service query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new other Service query" });
+  }
+});
+
+router.post("/edit_other_services", verifyToken, async (req, res) => {
+  try {
+    const { service_id, service_name, sub_cat_id, service_image } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      service_id,
+      service_name,
+      sub_cat_id,
+      service_image,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.other_servicestbl WHERE service_name ILIKE $1 AND service_id !=$2";
+    const valuesDuplicateCheck = [service_name, service_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res
+        .status(409)
+        .send({ message: "Sub Category Name already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE  vtpartner.other_servicestbl SET service_name=$1,sub_cat_id=$1,service_image=$1 where service_id=$4";
+    const values = [service_name, sub_cat_id, service_image, service_id];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating other service query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing updating other service query" });
+  }
+});
+
+//All Enquiries
+//select enquiry_id,enquirytbl.category_id,enquirytbl.sub_cat_id,enquirytbl.service_id,enquirytbl.vehicle_id,enquirytbl.city_id,name,mobile_no,time_at,source_type,enquirytbl.status,category_name,sub_cat_name,service_name,city_name,vehicle_name from vtpartner.other_servicestbl,vtpartner.available_citys_tbl,vtpartner.vehiclestbl,vtpartner.sub_categorytbl,vtpartner.categorytbl,vtpartner.enquirytbl where enquirytbl.category_id=categorytbl.category_id and enquirytbl.sub_cat_id=sub_categorytbl.sub_cat_id  and enquirytbl.service_id=other_servicestbl.service_id and enquirytbl.vehicle_id=vehiclestbl.vehicle_id and enquirytbl.city_id=available_citys_tbl.city_id;
+router.post("/all_enquiries", verifyToken, async (req, res) => {
+  try {
+    const { sub_cat_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      sub_cat_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "select enquiry_id,enquirytbl.category_id,enquirytbl.sub_cat_id,enquirytbl.service_id,enquirytbl.vehicle_id,enquirytbl.city_id,name,mobile_no,time_at,source_type,enquirytbl.status,category_name,sub_cat_name,service_name,city_name,vehicle_name from vtpartner.other_servicestbl,vtpartner.available_citys_tbl,vtpartner.vehiclestbl,vtpartner.sub_categorytbl,vtpartner.categorytbl,vtpartner.enquirytbl where enquirytbl.category_id=categorytbl.category_id and enquirytbl.sub_cat_id=sub_categorytbl.sub_cat_id  and enquirytbl.service_id=other_servicestbl.service_id and enquirytbl.vehicle_id=vehiclestbl.vehicle_id and enquirytbl.city_id=available_citys_tbl.city_id order by enquiry_id desc";
+    const values = [sub_cat_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      all_enquiries_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
   
 
 
