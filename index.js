@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dashboardApiV1 = require("./dashboard_api_v1"); // Import the dashboard API routes
+const websiteApiV1 = require("./website_api_v1"); // Import the dashboard API routes
 const multer = require("multer");
 const path = require("path");
-const fs = require('fs-extra'); // Import fs-extra for moving files
+const fs = require("fs-extra"); // Import fs-extra for moving files
 
 const app = express();
 
@@ -32,17 +33,23 @@ const allowedOrigins = [
 //   })
 // );
 
-const corsOrigin ={
-    origin:'http://localhost:3004', //or whatever port your frontend is using
-    credentials:true,            
-    optionSuccessStatus:200
-}
+const corsOrigin = {
+  origin: "http://localhost:3004", //or whatever port your frontend is using
+  credentials: true,
+  optionSuccessStatus: 200,
+};
 app.use(cors(corsOrigin));
 
 app.use(bodyParser.json()); // To parse JSON bodies
 
 // Use the dashboard API routes under /api/v1/dashboard
 app.use("/api/v1/dashboard", dashboardApiV1);
+
+// Use the website API routes under /api/v1/website
+app.use("/api/v1/website", websiteApiV1);
+
+
+
 // Ensure you have the correct uploads directory
 const backendUploadsDir = "/root/vtpartner-backend/uploads";
 const publicUploadsDir = "/var/www/vtpartner.org/uploads";
