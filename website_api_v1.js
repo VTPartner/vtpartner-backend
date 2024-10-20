@@ -39,3 +39,5 @@ router.post("/all_services", async (req, res) => {
     else res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
+module.exports = router;
