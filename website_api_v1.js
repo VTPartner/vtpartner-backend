@@ -74,6 +74,7 @@ router.get("/distance", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Error fetching distance data" });
   }
 });
