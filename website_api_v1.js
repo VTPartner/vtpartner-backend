@@ -3,7 +3,7 @@ const express = require("express");
 const db = require("./db"); // Import the database functions
 
 const router = express.Router();
-
+const mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o";
 // Utility function to validate required fields
 const checkMissingFields = (requiredFields) => {
   const missingFields = Object.keys(requiredFields).filter(
@@ -61,6 +61,20 @@ router.post("/all_allowed_cities", async (req, res) => {
     if (err.message === "No Data Found")
       res.status(404).send({ message: "No Data Found" });
     else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.get("/distance", async (req, res) => {
+  const { origins, destinations } = req.query;
+  const apiKey = mapKey;
+
+  try {
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=place_id:${origins}&destinations=place_id:${destinations}&units=metric&key=${apiKey}`
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching distance data" });
   }
 });
 
