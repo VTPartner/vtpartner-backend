@@ -1296,7 +1296,7 @@ router.post("/all_enquiries", verifyToken, async (req, res) => {
 
     // List of required fields
     const requiredFields = {
-      sub_cat_id,
+      category_id,
     };
 
     // Use the utility function to check for missing fields
