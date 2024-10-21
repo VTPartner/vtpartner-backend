@@ -208,7 +208,7 @@ router.post("/all_other_services", async (req, res) => {
   }
 });
 
-router.post("/add_new_enquiry", verifyToken, async (req, res) => {
+router.post("/add_new_enquiry", async (req, res) => {
   try {
     const {
       category_id,
