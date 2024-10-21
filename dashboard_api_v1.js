@@ -1292,7 +1292,7 @@ router.post("/edit_other_service", verifyToken, async (req, res) => {
 //select enquiry_id,enquirytbl.category_id,enquirytbl.sub_cat_id,enquirytbl.service_id,enquirytbl.vehicle_id,enquirytbl.city_id,name,mobile_no,time_at,source_type,enquirytbl.status,category_name,sub_cat_name,service_name,city_name,vehicle_name from vtpartner.other_servicestbl,vtpartner.available_citys_tbl,vtpartner.vehiclestbl,vtpartner.sub_categorytbl,vtpartner.categorytbl,vtpartner.enquirytbl where enquirytbl.category_id=categorytbl.category_id and enquirytbl.sub_cat_id=sub_categorytbl.sub_cat_id  and enquirytbl.service_id=other_servicestbl.service_id and enquirytbl.vehicle_id=vehiclestbl.vehicle_id and enquirytbl.city_id=available_citys_tbl.city_id;
 router.post("/all_enquiries", verifyToken, async (req, res) => {
   try {
-    const { sub_cat_id } = req.body;
+    const { category_id } = req.body;
 
     // List of required fields
     const requiredFields = {
@@ -1310,8 +1310,8 @@ router.post("/all_enquiries", verifyToken, async (req, res) => {
     }
 
     const query =
-      "select enquiry_id,enquirytbl.category_id,enquirytbl.sub_cat_id,enquirytbl.service_id,enquirytbl.vehicle_id,enquirytbl.city_id,name,mobile_no,time_at,source_type,enquirytbl.status,category_name,sub_cat_name,service_name,city_name,vehicle_name from vtpartner.other_servicestbl,vtpartner.available_citys_tbl,vtpartner.vehiclestbl,vtpartner.sub_categorytbl,vtpartner.categorytbl,vtpartner.enquirytbl where enquirytbl.category_id=categorytbl.category_id and enquirytbl.sub_cat_id=sub_categorytbl.sub_cat_id  and enquirytbl.service_id=other_servicestbl.service_id and enquirytbl.vehicle_id=vehiclestbl.vehicle_id and enquirytbl.city_id=available_citys_tbl.city_id order by enquiry_id desc";
-    const values = [sub_cat_id];
+      "SELECT enquiry_id, enquirytbl.category_id, enquirytbl.sub_cat_id, enquirytbl.service_id,enquirytbl.vehicle_id, enquirytbl.city_id, name, mobile_no, time_at, source_type,enquirytbl.status, category_name, sub_cat_name, service_name, city_name, vehicle_name FROM vtpartner.enquirytbl LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON enquirytbl.service_id = other_servicestbl.service_id LEFT JOIN vtpartner.vehiclestbl ON enquirytbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.available_citys_tbl ON enquirytbl.city_id = available_citys_tbl.city_id WHERE enquirytbl.category_id = $1 order by enquiry_id desc";
+    const values = [category_id];
 
     const result = await db.selectQuery(query, values);
 
