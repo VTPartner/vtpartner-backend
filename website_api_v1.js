@@ -208,6 +208,82 @@ router.post("/all_other_services", async (req, res) => {
   }
 });
 
+router.post("/add_new_enquiry", verifyToken, async (req, res) => {
+  try {
+    const {
+      category_id,
+      sub_cat_id,
+      service_id,
+      vehicle_id,
+      city_id,
+      name,
+      mobile_no,
+      source_type,
+    } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      sub_cat_id,
+      service_id,
+      vehicle_id,
+      city_id,
+      name,
+      mobile_no,
+      source_type,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validating to avoid duplication
+    const queryDuplicateCheck =
+      "SELECT COUNT(*) FROM vtpartner.enquirytbl WHERE name ILIKE $1 AND category_id=$2";
+    const valuesDuplicateCheck = [name, category_id];
+
+    const result = await db.selectQuery(
+      queryDuplicateCheck,
+      valuesDuplicateCheck
+    );
+
+    // Check if the result is greater than 0 to determine if the pincode already exists
+    if (result.length > 0 && result[0].count > 0) {
+      return res
+        .status(409)
+        .send({ message: "Enquiry Request already exists" });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.enquirytbl (category_id,sub_cat_id,service_id,vehicle_id,city_id,name,mobile_no,source_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
+    const values = [
+      category_id,
+      sub_cat_id,
+      service_id,
+      vehicle_id,
+      city_id,
+      name,
+      mobile_no,
+      source_type,
+    ];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new Enquiry query", err.stack);
+    res.status(500).send({ message: "Error executing add new Enquiry query" });
+  }
+});
+
 router.get("/distance", async (req, res) => {
   const { origins, destinations } = req.query;
   const apiKey = mapKey;
