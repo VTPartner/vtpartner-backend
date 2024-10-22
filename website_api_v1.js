@@ -128,6 +128,67 @@ router.post("/all_vehicles", async (req, res) => {
   }
 });
 
+
+router.post("/all_vehicles_with_price", async (req, res) => {
+  try {
+    const { category_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+    const query = `
+    SELECT 
+        v.vehicle_id,
+        v.vehicle_name,
+        v.weight,
+        vt.vehicle_type_id,
+        vt.vehicle_type_name,
+        v.description,
+        v.image,
+        v.size_image,
+        vc.starting_price_per_km
+    FROM 
+        vtpartner.vehiclestbl v
+    JOIN 
+        vtpartner.vehicle_types_tbl vt ON v.vehicle_type_id = vt.vehicle_type_id
+    LEFT JOIN 
+        vtpartner.vehicle_city_wise_price_tbl vc ON v.vehicle_id = vc.vehicle_id 
+    WHERE 
+        v.category_id = $1 AND vc.city_id = '1'
+    ORDER BY 
+        v.vehicle_id DESC
+  `;
+    const values = [category_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      vehicle_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 router.post("/all_sub_categories", async (req, res) => {
   try {
     const { category_id } = req.body;
