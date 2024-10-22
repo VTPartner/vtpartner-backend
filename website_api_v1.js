@@ -131,11 +131,12 @@ router.post("/all_vehicles", async (req, res) => {
 
 router.post("/all_vehicles_with_price", async (req, res) => {
   try {
-    const { category_id } = req.body;
+    const { category_id, city_id } = req.body;
 
     // List of required fields
     const requiredFields = {
       category_id,
+      city_id,
     };
 
     // Use the utility function to check for missing fields
@@ -166,11 +167,11 @@ router.post("/all_vehicles_with_price", async (req, res) => {
     LEFT JOIN 
         vtpartner.vehicle_city_wise_price_tbl vc ON v.vehicle_id = vc.vehicle_id 
     WHERE 
-        v.category_id = $1 AND vc.city_id = '1'
+        v.category_id = $1 AND vc.city_id = $2
     ORDER BY 
         v.vehicle_id DESC
   `;
-    const values = [category_id];
+    const values = [category_id, city_id];
 
     const result = await db.selectQuery(query, values);
 
