@@ -1344,6 +1344,121 @@ router.post("/all_enquiries", verifyToken, async (req, res) => {
   }
 });
   
+//Other Services [ WireMan,etc ]
+router.post("/all_gallery_images", verifyToken, async (req, res) => {
+  try {
+    const { category_type_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_type_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    const query =
+      "select gallery_id,image_url,category_type,epoch from vtpartner.service_gallerytbl,vtpartner.category_type_tbl where service_gallerytbl.category_type_id=category_type_tbl.cat_type_id and service_gallerytbl.category_type_id=$1";
+    const values = [category_type_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      gallery_images_data: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/add_gallery_image", verifyToken, async (req, res) => {
+  try {
+    const { image_url, category_type_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      image_url, category_type_id
+    };
+
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+  
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.service_gallerytbl (image_url,category_type_id) VALUES ($1, $2)";
+    const values = [image_url, category_type_id];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new gallery image query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new gallery image query" });
+  }
+});
+
+router.post("/edit_gallery_image", verifyToken, async (req, res) => {
+  try {
+    const { image_url, gallery_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      image_url, gallery_id
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE vtpartner.service_gallerytbl set image_url=$1,epoch=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where gallery_id=$2";
+    const values = [service_name, sub_cat_id, service_image, service_id];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating gallery image query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing updating gallery image query" });
+  }
+});
 
 
 module.exports = router;
