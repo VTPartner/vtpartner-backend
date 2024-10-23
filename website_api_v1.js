@@ -42,6 +42,9 @@ const storage = multer.diskStorage({
 // Init upload
 const upload = multer({
   storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // Set limit to 10 MB
+  },
   // limits: { fileSize: 1000000 }, // Optionally set limits
 }).single("vtPartnerImage");
 
