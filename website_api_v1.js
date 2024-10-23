@@ -2,6 +2,10 @@
 const express = require("express");
 const db = require("./db"); // Import the database functions
 const axios = require("axios");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs-extra");
+
 const router = express.Router();
 const mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o";
 // Utility function to validate required fields
@@ -16,6 +20,63 @@ const checkMissingFields = (requiredFields) => {
   // Return missing fields if any, otherwise return null
   return missingFields.length > 0 ? missingFields : null;
 };
+
+// Ensure you have the correct uploads directory
+const backendUploadsDir = "/root/vtpartner-backend/uploads";
+const publicUploadsDir = "/var/www/vtpartner.org/uploads";
+
+// Serve static files from the public uploads directory
+router.use("/uploads", express.static(publicUploadsDir));
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: backendUploadsDir, // Use the backend uploads directory
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+// Init upload
+const upload = multer({
+  storage: storage,
+  // limits: { fileSize: 1000000 }, // Optionally set limits
+}).single("vtPartnerImage");
+
+// Handle file upload
+router.post("/upload", (req, res) => {
+  console.log("Uploading Image::", req.body);
+  upload(req, res, async (err) => {
+    if (err) {
+      console.log("Error Uploading Image::", err);
+      return res.status(500).send("Error uploading file.");
+    }
+
+    // Check if file is uploaded
+    if (!req.file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    // Define the source and destination paths
+    const sourcePath = path.join(backendUploadsDir, req.file.filename);
+    const destPath = path.join(publicUploadsDir, req.file.filename);
+
+    try {
+      // Move the file to the public uploads directory
+      await fs.move(sourcePath, destPath);
+
+      // Return the full image URL under your domain
+      const imageUrl = `https://vtpartner.org/uploads/${req.file.filename}`;
+      console.log("Uploaded ImageUrl::", imageUrl);
+      res.status(200).json({ imageUrl });
+    } catch (moveError) {
+      console.error("Error moving file:", moveError);
+      return res.status(500).send("Error moving uploaded file.");
+    }
+  });
+});
 
 router.post("/fare_result", async (req, res) => {
   try {
