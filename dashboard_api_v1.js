@@ -1447,7 +1447,7 @@ router.post("/edit_gallery_image", verifyToken, async (req, res) => {
     // If pincode is not duplicate, proceed to insert
     const query =
       "UPDATE vtpartner.service_gallerytbl set image_url=$1,epoch=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where gallery_id=$2";
-    const values = [service_name, sub_cat_id, service_image, service_id];
+    const values = [image_url, gallery_id];
     const rowCount = await db.updateQuery(query, values);
 
     // Send success response
