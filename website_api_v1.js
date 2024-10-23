@@ -17,6 +17,47 @@ const checkMissingFields = (requiredFields) => {
   return missingFields.length > 0 ? missingFields : null;
 };
 
+router.post("/fare_result", async (req, res) => {
+  try {
+    const { category_id, city_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      category_id,
+      city_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+    const query =
+      "select vehiclestbl.vehicle_id,vehicle_name,weight,size_image from vtpartner.vehicle_city_wise_price_tbl,vtpartner.vehiclestbl where vehicle_city_wise_price_tbl.vehicle_id=vehiclestbl.vehicle_id and category_id=$1 and city_id=$2";
+    const values = [category_id, city_id];
+
+    const result = await db.selectQuery(query);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      fare_result: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 router.post("/all_services", async (req, res) => {
   try {
     const query =
