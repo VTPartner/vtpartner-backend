@@ -375,6 +375,52 @@ router.post("/all_other_services", async (req, res) => {
   }
 });
 
+router.post("/all_delivery_gallery_images", async (req, res) => {
+  try {
+    const query =
+      "select gallery_id,image_url,category_type,epoch from vtpartner.service_gallerytbl,vtpartner.category_type_tbl where service_gallerytbl.category_type_id=category_type_tbl.cat_type_id and service_gallerytbl.category_type_id='1' order by gallery_id asc";
+    const values = [sub_cat_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      gallery_data_delivery: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/all_services_gallery_images", async (req, res) => {
+  try {
+    const query =
+      "select gallery_id,image_url,category_type,epoch from vtpartner.service_gallerytbl,vtpartner.category_type_tbl where service_gallerytbl.category_type_id=category_type_tbl.cat_type_id and service_gallerytbl.category_type_id='2' order by gallery_id asc";
+    const values = [sub_cat_id];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      gallery_data_services: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 router.post("/add_new_enquiry", async (req, res) => {
   try {
     const {
