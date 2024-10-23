@@ -379,9 +379,8 @@ router.post("/all_delivery_gallery_images", async (req, res) => {
   try {
     const query =
       "select gallery_id,image_url,category_type,epoch from vtpartner.service_gallerytbl,vtpartner.category_type_tbl where service_gallerytbl.category_type_id=category_type_tbl.cat_type_id and service_gallerytbl.category_type_id='1' order by gallery_id asc";
-    const values = [sub_cat_id];
 
-    const result = await db.selectQuery(query, values);
+    const result = await db.selectQuery(query);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
@@ -402,9 +401,8 @@ router.post("/all_services_gallery_images", async (req, res) => {
   try {
     const query =
       "select gallery_id,image_url,category_type,epoch from vtpartner.service_gallerytbl,vtpartner.category_type_tbl where service_gallerytbl.category_type_id=category_type_tbl.cat_type_id and service_gallerytbl.category_type_id='2' order by gallery_id asc";
-    const values = [sub_cat_id];
 
-    const result = await db.selectQuery(query, values);
+    const result = await db.selectQuery(query);
 
     if (result.length === 0) {
       return res.status(404).send({ message: "No Data Found" });
