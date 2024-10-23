@@ -8,11 +8,7 @@ const path = require("path");
 const fs = require("fs-extra"); // Import fs-extra for moving files
 
 const app = express();
-app.use(
-  cors({
-    origin: "https://vtpartner.org", // or use '*' for all origins (not recommended for production)
-  })
-);
+
 // Use CORS middleware to allow requests from multiple origins
 const allowedOrigins = [
   "http://77.37.47.156:3786",
@@ -77,6 +73,7 @@ const upload = multer({
 
 // Handle file upload
 app.post("/upload", (req, res) => {
+  console.log("Uploading Image::", req.body);
   upload(req, res, async (err) => {
     if (err) {
       console.log("Error Uploading Image::", err);
