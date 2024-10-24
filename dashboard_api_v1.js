@@ -23,7 +23,7 @@ const checkMissingFields = (requiredFields) => {
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token is sent in the Authorization header
-
+  console.log("token::", token);
   if (!token) return res.status(403).send({ message: "Token is missing" });
 
   try {
@@ -1389,7 +1389,7 @@ router.post("/all_gallery_images", verifyToken, async (req, res) => {
 router.post("/enquiries_all", verifyToken, async (req, res) => {
   try {
     const query =
-      "SELECT enquiry_id,enquirytbl.category_id, enquirytbl.sub_cat_id, enquirytbl.service_id,enquirytbl.vehicle_id, enquirytbl.city_id, name, mobile_no, time_at, source_type,enquirytbl.status, category_name, sub_cat_name, service_name, city_name, vehicle_name,enquirytbl.status FROM vtpartner.enquirytbl LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON enquirytbl.service_id = other_servicestbl.service_id LEFT JOIN vtpartner.vehiclestbl ON enquirytbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.available_citys_tbl ON enquirytbl.city_id = available_citys_tbl.city_id  order by enquiry_id desc";
+      "SELECT enquiry_id,enquirytbl.category_id, enquirytbl.sub_cat_id, enquirytbl.service_id,enquirytbl.vehicle_id, enquirytbl.city_id, name, mobile_no, time_at, source_type,enquirytbl.status, category_name, sub_cat_name, service_name, city_name, vehicle_name,enquirytbl.status FROM vtpartner.enquirytbl LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON enquirytbl.service_id = other_servicestbl.service_id LEFT JOIN vtpartner.vehiclestbl ON enquirytbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.available_citys_tbl ON enquirytbl.city_id = available_citys_tbl.city_id ";
     const values = [];
 
     const result = await db.selectQuery(query, values);
