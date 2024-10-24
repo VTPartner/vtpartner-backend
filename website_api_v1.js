@@ -102,7 +102,7 @@ router.post("/fare_result", async (req, res) => {
       });
     }
     const query =
-      "select vehiclestbl.vehicle_id,vehicle_name,weight,size_image,starting_price_per_km from vtpartner.vehicle_city_wise_price_tbl,vtpartner.vehiclestbl where vehicle_city_wise_price_tbl.vehicle_id=vehiclestbl.vehicle_id and category_id=$1 and city_id=$2";
+      "select vehiclestbl.vehicle_id,vehicle_name,weight,size_image,starting_price_per_km from vtpartner.vehicle_city_wise_price_tbl,vtpartner.vehiclestbl where vehicle_city_wise_price_tbl.vehicle_id=vehiclestbl.vehicle_id and category_id=$1 and city_id=$2 order by weight asc";
     const values = [category_id, city_id];
 
     const result = await db.selectQuery(query, values);
