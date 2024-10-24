@@ -5,7 +5,7 @@ const db = require("./db"); // Import the database functions
 
 
 const router = express.Router();
-
+console.log("Entered Dashboard Api");
 
 // Utility function to validate required fields
 const checkMissingFields = (requiredFields) => {
@@ -1345,31 +1345,6 @@ router.post("/all_enquiries", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/enquiries_all", verifyToken, async (req, res) => {
-  console.log("all_enquiries_full");
-  try {
-    const query =
-      "SELECT enquiry_id,enquirytbl.category_id, enquirytbl.sub_cat_id, enquirytbl.service_id,enquirytbl.vehicle_id, enquirytbl.city_id, name, mobile_no, time_at, source_type,enquirytbl.status, category_name, sub_cat_name, service_name, city_name, vehicle_name,enquirytbl.status FROM vtpartner.enquirytbl LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON enquirytbl.service_id = other_servicestbl.service_id LEFT JOIN vtpartner.vehiclestbl ON enquirytbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.available_citys_tbl ON enquirytbl.city_id = available_citys_tbl.city_id  order by enquiry_id desc";
-    console.log("query::::", query);
-    const values = [];
-
-    const result = await db.selectQuery(query);
-
-    if (result.length === 0) {
-      return res.status(404).send({ message: "No Data Found" });
-    }
-
-    res.status(200).send({
-      all_enquiries_details: result,
-    });
-  } catch (err) {
-    console.error("Error executing query", err.stack);
-    if (err.message === "No Data Found")
-      res.status(404).send({ message: "No Data Found" });
-    else res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-  
 //Other Services [ WireMan,etc ]
 router.post("/all_gallery_images", verifyToken, async (req, res) => {
   try {
@@ -1402,6 +1377,29 @@ router.post("/all_gallery_images", verifyToken, async (req, res) => {
 
     res.status(200).send({
       gallery_images_data: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/enquiries_all", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "SELECT enquiry_id,enquirytbl.category_id, enquirytbl.sub_cat_id, enquirytbl.service_id,enquirytbl.vehicle_id, enquirytbl.city_id, name, mobile_no, time_at, source_type,enquirytbl.status, category_name, sub_cat_name, service_name, city_name, vehicle_name,enquirytbl.status FROM vtpartner.enquirytbl LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON enquirytbl.service_id = other_servicestbl.service_id LEFT JOIN vtpartner.vehiclestbl ON enquirytbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.available_citys_tbl ON enquirytbl.city_id = available_citys_tbl.city_id  order by enquiry_id desc";
+    const values = [];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      all_enquiries_details: result,
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
