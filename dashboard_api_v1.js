@@ -32,6 +32,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded; // Attach decoded user info (e.g., admin_id, admin_name) to request object
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
+    console.log("errorToken::", error);
     res.status(401).send({ message: "Invalid token" });
   }
 };
