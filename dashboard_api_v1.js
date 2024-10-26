@@ -1662,6 +1662,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
   try {
     // Destructure fields from request body
     const {
+      enquiry_id,
       agent_name,
       mobile_no,
       gender,
@@ -1698,6 +1699,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
 
     // Required fields check
     const requiredFields = {
+      enquiry_id,
       agent_name,
       mobile_no,
       gender,
@@ -1712,6 +1714,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     );
 
     if (missingFields.length > 0) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
       return res.status(400).json({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
