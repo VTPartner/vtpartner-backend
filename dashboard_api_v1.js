@@ -1386,6 +1386,81 @@ router.post("/all_gallery_images", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/add_gallery_image", verifyToken, async (req, res) => {
+  try {
+    const { image_url, category_type_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      image_url,
+      category_type_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "INSERT INTO vtpartner.service_gallerytbl (image_url,category_type_id) VALUES ($1, $2)";
+    const values = [image_url, category_type_id];
+    const rowCount = await db.insertQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing add new gallery image query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing add new gallery image query" });
+  }
+});
+
+router.post("/edit_gallery_image", verifyToken, async (req, res) => {
+  try {
+    const { image_url, gallery_id } = req.body;
+
+    // List of required fields
+    const requiredFields = {
+      image_url,
+      gallery_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // If pincode is not duplicate, proceed to insert
+    const query =
+      "UPDATE vtpartner.service_gallerytbl set image_url=$1,epoch=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where gallery_id=$2";
+    const values = [image_url, gallery_id];
+    const rowCount = await db.updateQuery(query, values);
+
+    // Send success response
+    res.status(200).send({ message: `${rowCount} row(s) inserted` });
+  } catch (err) {
+    console.error("Error executing updating gallery image query", err.stack);
+    res
+      .status(500)
+      .send({ message: "Error executing updating gallery image query" });
+  }
+});
+
+//All Enquiries
 router.post("/enquiries_all", verifyToken, async (req, res) => {
   try {
     const query =
@@ -1409,15 +1484,15 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/add_gallery_image", verifyToken, async (req, res) => {
+router.post("/register_new_agent", verifyToken, async (req, res) => {
   try {
-    const { image_url, category_type_id } = req.body;
+    const { image_url, category_id } = req.body;
 
     // List of required fields
     const requiredFields = {
-      image_url, category_type_id
+      image_url,
+      category_type_id,
     };
-
 
     // Use the utility function to check for missing fields
     const missingFields = checkMissingFields(requiredFields);
@@ -1430,7 +1505,6 @@ router.post("/add_gallery_image", verifyToken, async (req, res) => {
       });
     }
 
-  
     // If pincode is not duplicate, proceed to insert
     const query =
       "INSERT INTO vtpartner.service_gallerytbl (image_url,category_type_id) VALUES ($1, $2)";
@@ -1447,42 +1521,6 @@ router.post("/add_gallery_image", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/edit_gallery_image", verifyToken, async (req, res) => {
-  try {
-    const { image_url, gallery_id } = req.body;
-
-    // List of required fields
-    const requiredFields = {
-      image_url, gallery_id
-    };
-
-    // Use the utility function to check for missing fields
-    const missingFields = checkMissingFields(requiredFields);
-
-    // If there are missing fields, return an error response
-    if (missingFields) {
-      console.log(`Missing required fields: ${missingFields.join(", ")}`);
-      return res.status(400).send({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
-
-    
-    // If pincode is not duplicate, proceed to insert
-    const query =
-      "UPDATE vtpartner.service_gallerytbl set image_url=$1,epoch=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where gallery_id=$2";
-    const values = [image_url, gallery_id];
-    const rowCount = await db.updateQuery(query, values);
-
-    // Send success response
-    res.status(200).send({ message: `${rowCount} row(s) inserted` });
-  } catch (err) {
-    console.error("Error executing updating gallery image query", err.stack);
-    res
-      .status(500)
-      .send({ message: "Error executing updating gallery image query" });
-  }
-});
 
 
 module.exports = router;
