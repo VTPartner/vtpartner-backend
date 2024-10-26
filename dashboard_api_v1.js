@@ -1661,6 +1661,7 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
 router.post("/register_agent", verifyToken, async (req, res) => {
   try {
     // Destructure fields from request body
+    console.log("req.body::", req.body);
     const {
       enquiry_id,
       agent_name,
