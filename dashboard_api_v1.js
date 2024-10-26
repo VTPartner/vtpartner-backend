@@ -1710,13 +1710,13 @@ router.post("/register_agent", verifyToken, async (req, res) => {
       city_id,
     };
 
-    const missingFields = Object.keys(requiredFields).filter(
-      (field) => !requiredFields[field]
-    );
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
 
-    if (missingFields.length > 0) {
+    // If there are missing fields, return an error response
+    if (missingFields) {
       console.log(`Missing required fields: ${missingFields.join(", ")}`);
-      return res.status(400).json({
+      return res.status(400).send({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
