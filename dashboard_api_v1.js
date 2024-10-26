@@ -1815,7 +1815,7 @@ console.log("category_id::", category_id);
     let insertDriverQuery;
     let driverValues;
 
-    if (category_id === 4) {
+    if (category_id === 5) {
       // Handyman Service specific columns
       insertDriverQuery = `
         INSERT INTO ${driverTable} (
