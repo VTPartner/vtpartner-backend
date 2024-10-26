@@ -1484,42 +1484,458 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/register_new_agent", verifyToken, async (req, res) => {
-  try {
-    const { image_url, category_id } = req.body;
+// router.post("/register_driver_agent", verifyToken, async (req, res) => {
+//   try {
+//     // Destructure fields from request body
+//     const {
+//       agent_name,
+//       mobile_no,
+//       gender,
+//       aadhar_no,
+//       pan_no,
+//       city_name,
+//       house_no,
+//       address,
+//       agent_photo_url,
+//       aadhar_card_front_url,
+//       aadhar_card_back_url,
+//       pan_card_front_url,
+//       pan_card_back_url,
+//       license_front_url,
+//       license_back_url,
+//       insurance_image_url,
+//       noc_image_url,
+//       pollution_certificate_image_url,
+//       rc_image_url,
+//       vehicle_image_url,
+//       category_id,
+//       vehicle_id,
+//       city_id,
+//       optionalDocuments,
+//       owner_name,
+//       owner_mobile_no,
+//       owner_house_no,
+//       owner_city_name,
+//       owner_address,
+//       owner_photo_url,
+//     } = req.body;
 
-    // List of required fields
+//     // Required fields check
+//     const requiredFields = {
+//       agent_name,
+//       mobile_no,
+//       gender,
+//       aadhar_no,
+//       pan_no,
+//       category_id,
+//       vehicle_id,
+//       city_id,
+//     };
+
+//     const missingFields = Object.keys(requiredFields).filter(
+//       (field) => !requiredFields[field]
+//     );
+
+//     if (missingFields.length > 0) {
+//       return res.status(400).json({
+//         message: `Missing required fields: ${missingFields.join(", ")}`,
+//       });
+//     }
+
+//     // Check if owner exists by mobile number
+//     let ownerId = null;
+//     if (owner_name && owner_mobile_no) {
+//       const checkOwnerQuery = `
+//         SELECT owner_id 
+//         FROM vtpartner.owner_tbl 
+//         WHERE owner_mobile_no = $1
+//       `;
+//       const ownerResult = await db.query(checkOwnerQuery, [owner_mobile_no]);
+
+//       if (ownerResult.rows.length > 0) {
+//         // Owner exists, get the existing owner ID
+//         ownerId = ownerResult.rows[0].owner_id;
+//       } else {
+//         // Insert owner data into owner_tbl if it does not exist
+//         const insertOwnerQuery = `
+//           INSERT INTO vtpartner.owner_tbl (
+//             owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+//           ) VALUES ($1, $2, $3, $4, $5, $6)
+//           RETURNING owner_id
+//         `;
+
+//         const ownerValues = [
+//           owner_name,
+//           owner_mobile_no,
+//           owner_house_no,
+//           owner_city_name,
+//           owner_address,
+//           owner_photo_url,
+//         ];
+
+//         const newOwnerResult = await db.insertQuery(
+//           insertOwnerQuery,
+//           ownerValues
+//         );
+//         ownerId = newOwnerResult.rows[0].owner_id;
+//       }
+//     }
+
+//     // Insert agent data into goods_driverstbl, including image URLs
+//     const insertGoodsDriverQuery = `
+//       INSERT INTO vtpartner.goods_driverstbl (
+//         driver_first_name, mobile_no, gender, aadhar_no, pan_card_no, 
+//         city_name, house_no, full_address, profile_pic, aadhar_card_front, 
+//         aadhar_card_back, pan_card_front, pan_card_back, license_front, 
+//         license_back, insurance_image, noc_image, pollution_certificate_image, 
+//         rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id
+//       ) 
+//       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 
+//       $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
+//       RETURNING goods_driver_id
+//     `;
+
+//     const agentValues = [
+//       agent_name,
+//       mobile_no,
+//       gender,
+//       aadhar_no,
+//       pan_no,
+//       city_name,
+//       house_no,
+//       address,
+//       agent_photo_url,
+//       aadhar_card_front_url,
+//       aadhar_card_back_url,
+//       pan_card_front_url,
+//       pan_card_back_url,
+//       license_front_url,
+//       license_back_url,
+//       insurance_image_url,
+//       noc_image_url,
+//       pollution_certificate_image_url,
+//       rc_image_url,
+//       vehicle_image_url,
+//       category_id,
+//       vehicle_id,
+//       city_id,
+//       ownerId,
+//     ];
+
+//     const agentResult = await db.insertQuery(
+//       insertGoodsDriverQuery,
+//       agentValues
+//     );
+//     const goodsDriverId = agentResult.rows[0].goods_driver_id;
+
+//     // Insert optional documents into documents_vehicle_verified_tbl if any
+//     if (optionalDocuments && optionalDocuments.length > 0) {
+//       const insertDocumentQuery = `
+//         INSERT INTO vtpartner.documents_vehicle_verified_tbl (
+//           document_name, document_image_url, goods_driver_id
+//         ) 
+//         VALUES ($1, $2, $3)
+//       `;
+
+//       for (const doc of optionalDocuments) {
+//         const documentValues = [doc.other, doc.imageUrl, goodsDriverId];
+//         await db.insertQuery(insertDocumentQuery, documentValues);
+//       }
+//     }
+
+//     // Respond with success
+//     res.status(200).json({
+//       message: `Agent and owner registered successfully with Agent ID: ${goodsDriverId}`,
+//     });
+//   } catch (error) {
+//     console.error("Error registering new goods agent:", error);
+//     res.status(500).json({
+//       message: "An error occurred while registering the agent.",
+//     });
+//   }
+// });
+
+//
+
+//Registering All Agents After Enquiry is Done
+router.post("/register_agent", verifyToken, async (req, res) => {
+  try {
+    // Destructure fields from request body
+    const {
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      sub_cat_id,
+      service_id,
+      vehicle_id,
+      city_id,
+      optionalDocuments,
+      owner_name,
+      owner_mobile_no,
+      owner_house_no,
+      owner_city_name,
+      owner_address,
+      owner_photo_url,
+    } = req.body;
+
+    // Required fields check
     const requiredFields = {
-      image_url,
-      category_type_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      category_id,
+      city_id,
     };
 
-    // Use the utility function to check for missing fields
-    const missingFields = checkMissingFields(requiredFields);
+    const missingFields = Object.keys(requiredFields).filter(
+      (field) => !requiredFields[field]
+    );
 
-    // If there are missing fields, return an error response
-    if (missingFields) {
-      console.log(`Missing required fields: ${missingFields.join(", ")}`);
-      return res.status(400).send({
+    if (missingFields.length > 0) {
+      return res.status(400).json({
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
-    // If pincode is not duplicate, proceed to insert
-    const query =
-      "INSERT INTO vtpartner.service_gallerytbl (image_url,category_type_id) VALUES ($1, $2)";
-    const values = [image_url, category_type_id];
-    const rowCount = await db.insertQuery(query, values);
+    // Check if owner exists by mobile number
+    let ownerId = null;
+    if (owner_name && owner_mobile_no) {
+      const checkOwnerQuery = `
+        SELECT owner_id 
+        FROM vtpartner.owner_tbl 
+        WHERE owner_mobile_no = $1
+      `;
+      const ownerResult = await db.query(checkOwnerQuery, [owner_mobile_no]);
 
-    // Send success response
-    res.status(200).send({ message: `${rowCount} row(s) inserted` });
-  } catch (err) {
-    console.error("Error executing add new gallery image query", err.stack);
-    res
-      .status(500)
-      .send({ message: "Error executing add new gallery image query" });
+      if (ownerResult.rows.length > 0) {
+        // Owner exists, get the existing owner ID
+        ownerId = ownerResult.rows[0].owner_id;
+      } else {
+        // Insert owner data into owner_tbl if it does not exist
+        const insertOwnerQuery = `
+          INSERT INTO vtpartner.owner_tbl (
+            owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+          ) VALUES ($1, $2, $3, $4, $5, $6)
+          RETURNING owner_id
+        `;
+
+        const ownerValues = [
+          owner_name,
+          owner_mobile_no,
+          owner_house_no,
+          owner_city_name,
+          owner_address,
+          owner_photo_url,
+        ];
+
+        const newOwnerResult = await db.insertQuery(
+          insertOwnerQuery,
+          ownerValues
+        );
+        ownerId = newOwnerResult.rows[0].owner_id;
+      }
+    }
+
+    // Insert agent data based on category_id
+    let driverTable, nameColumn, driverIdField, driverId;
+
+    switch (category_id) {
+      case 1: // Goods Driver
+        driverTable = "vtpartner.goods_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "goods_driver_id";
+        break;
+      case 2: // Cab Driver
+        driverTable = "vtpartner.cab_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "cab_driver_id";
+        break;
+      case 3: // JCB/Crane Driver
+        driverTable = "vtpartner.jcb_crane_driverstbl";
+        nameColumn = "driver_name";
+        driverIdField = "jcb_crane_driver_id";
+        break;
+      case 4: // Handyman Service
+        driverTable = "vtpartner.handyman_servicestbl";
+        nameColumn = "name";
+        driverIdField = "handyman_id";
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid category_id" });
+    }
+
+    // Prepare common values
+    const commonValues = [
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      ownerId,
+    ];
+
+    // Insert into appropriate driver table
+    let insertDriverQuery;
+    let driverValues;
+
+    if (category_id === 4) {
+      // Handyman Service specific columns
+      insertDriverQuery = `
+        INSERT INTO ${driverTable} (
+          ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
+          city_name, house_no, full_address, profile_pic, 
+          aadhar_card_front, aadhar_card_back, pan_card_front, 
+          pan_card_back, category_id, city_id, sub_cat_id, service_id,owner_id
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+          $10, $11, $12, $13, $14, $15, $16)
+        RETURNING ${driverIdField}
+      `;
+      driverValues = [
+        ...commonValues,
+        category_id,
+        city_id,
+        sub_cat_id,
+        service_id,
+      ];
+    } else {
+      // Other categories (Goods, Cab, JCB/Crane)
+      insertDriverQuery = `
+        INSERT INTO ${driverTable} (
+          ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
+          city_name, house_no, full_address, profile_pic, 
+          aadhar_card_front, aadhar_card_back, pan_card_front, 
+          pan_card_back, license_front, license_back, 
+          insurance_image, noc_image, pollution_certificate_image, 
+          rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+          $10, $11, $12, $13, $14, $15, $16, $17, $18, 
+          $19, $20, $21, $22, $23, $24, $25)
+        RETURNING ${driverIdField}
+      `;
+      driverValues = [
+        ...commonValues,
+        agent_photo_url,
+        aadhar_card_front_url,
+        aadhar_card_back_url,
+        pan_card_front_url,
+        pan_card_back_url,
+        license_front_url,
+        license_back_url,
+        insurance_image_url,
+        noc_image_url,
+        pollution_certificate_image_url,
+        rc_image_url,
+        vehicle_image_url,
+        category_id,
+        vehicle_id,
+        city_id,
+      ];
+    }
+
+    const driverResult = await db.insertQuery(insertDriverQuery, driverValues);
+    driverId = driverResult.rows[0][driverIdField];
+
+    // Insert optional documents into documents_vehicle_verified_tbl if any
+    if (optionalDocuments && optionalDocuments.length > 0) {
+      const insertDocumentQuery = `
+        INSERT INTO vtpartner.documents_vehicle_verified_tbl (
+          document_name, document_image_url, ${driverIdField}
+        ) 
+        VALUES ($1, $2, $3)
+      `;
+
+      for (const doc of optionalDocuments) {
+        const documentValues = [doc.other, doc.imageUrl, driverId];
+        await db.insertQuery(insertDocumentQuery, documentValues);
+      }
+    }
+
+    // Respond with success
+    res.status(200).json({
+      message: `Agent and owner registered successfully with Agent ID: ${driverId}`,
+    });
+  } catch (error) {
+    console.error("Error registering new agent:", error);
+    res.status(500).json({
+      message: "An error occurred while registering the agent.",
+    });
   }
 });
+
+router.get("/check_driver_existence", verifyToken, async (req, res) => {
+  try {
+    const { mobile_no } = req.query;
+
+    // Validate that mobile_no is provided
+    if (!mobile_no) {
+      return res.status(400).json({ message: "Mobile number is required." });
+    }
+
+    // Query to check if the driver exists with the given mobile number
+    const checkDriverQuery = `
+      SELECT goods_driver_id 
+      FROM vtpartner.goods_driverstbl 
+      WHERE mobile_no = $1
+    `;
+
+    const result = await db.query(checkDriverQuery, [mobile_no]);
+
+    if (result.rows.length > 0) {
+      // Driver exists, return a message with their ID
+      const driverId = result.rows[0].goods_driver_id;
+      return res.status(200).json({
+        message: `Driver already exists with ID: ${driverId}`,
+        exists: true,
+        driverId: driverId,
+      });
+    } else {
+      // Driver does not exist
+      return res.status(200).json({
+        message:
+          "Driver does not exist. Mobile number is available for registration.",
+        exists: false,
+      });
+    }
+  } catch (error) {
+    console.error("Error checking driver existence:", error);
+    res.status(500).json({
+      message: "An error occurred while checking driver existence.",
+    });
+  }
+});
+
+
+
 
 
 
