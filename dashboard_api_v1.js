@@ -1779,7 +1779,12 @@ console.log("category_id::", category_id);
         nameColumn = "driver_name";
         driverIdField = "jcb_crane_driver_id";
         break;
-      case 4: // Handyman Service
+      // case 4: // Driver
+      //   driverTable = "vtpartner.jcb_crane_driverstbl";
+      //   nameColumn = "driver_name";
+      //   driverIdField = "jcb_crane_driver_id";
+      //   break;
+      case 5: // Handyman Service
         driverTable = "vtpartner.handyman_servicestbl";
         nameColumn = "name";
         driverIdField = "handyman_id";
