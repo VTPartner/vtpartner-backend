@@ -1762,7 +1762,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
 
     // Insert agent data based on category_id
     let driverTable, nameColumn, driverIdField, driverId;
-
+console.log("category_id::", category_id);
     switch (category_id) {
       case 1: // Goods Driver
         driverTable = "vtpartner.goods_driverstbl";
