@@ -35,14 +35,17 @@ async function selectQuery(query, params = []) {
 }
 
 // Function to execute an INSERT query
+// Function to execute an INSERT query
 async function insertQuery(query, params) {
   try {
-    console.log("Insert Query::=>",query);
+    console.log("Insert Query::=>", query);
     const result = await pool.query(query, params);
     if (result.rowCount === 0) {
       throw new Error("Insert operation failed");
     }
-    return result.rowCount; // Returns the number of rows affected
+
+    // Check if there are any rows returned (e.g., from a RETURNING clause)
+    return result.rows.length > 0 ? result.rows : result.rowCount;
   } catch (err) {
     if (err.message === 'Insert operation failed') {
       console.error('Error: Failed to insert data');
@@ -52,6 +55,24 @@ async function insertQuery(query, params) {
     throw err; // Re-throw the error to be handled by the calling function
   }
 }
+
+// async function insertQuery(query, params) {
+//   try {
+//     console.log("Insert Query::=>",query);
+//     const result = await pool.query(query, params);
+//     if (result.rowCount === 0) {
+//       throw new Error("Insert operation failed");
+//     }
+//     return result.rowCount; // Returns the number of rows affected
+//   } catch (err) {
+//     if (err.message === 'Insert operation failed') {
+//       console.error('Error: Failed to insert data');
+//     } else {
+//       console.error('Error executing query', err.stack);
+//     }
+//     throw err; // Re-throw the error to be handled by the calling function
+//   }
+// }
 
 // Function to execute an UPDATE query
 async function updateQuery(query, params) {
