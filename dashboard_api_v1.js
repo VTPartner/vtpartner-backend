@@ -1756,7 +1756,13 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           insertOwnerQuery,
           ownerValues
         );
-        ownerId = newOwnerResult.rows[0].owner_id;
+
+        // Extract owner_id if there is a returned row
+        if (Array.isArray(newOwnerResult) && newOwnerResult.length > 0) {
+          ownerId = newOwnerResult[0].owner_id;
+        } else {
+          throw new Error("Failed to retrieve driver ID from insert operation");
+        }
       }
     }
 
@@ -1874,7 +1880,14 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     }
 
     const driverResult = await db.insertQuery(insertDriverQuery, driverValues);
-    driverId = driverResult.rows[0][driverIdField];
+
+    // Extract owner_id if there is a returned row
+    if (Array.isArray(driverResult) && driverResult.length > 0) {
+      driverId = driverResult[0][driverIdField];
+    } else {
+      throw new Error("Failed to retrieve driver ID from insert operation");
+    }
+    
 
     // Insert optional documents into documents_vehicle_verified_tbl if any
     if (optionalDocuments && optionalDocuments.length > 0) {
