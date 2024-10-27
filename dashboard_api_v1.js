@@ -1931,10 +1931,11 @@ router.post("/register_agent", verifyToken, async (req, res) => {
 
 router.post("/check_driver_existence", verifyToken, async (req, res) => {
   try {
-    const { mobile_no } = req.body;
+    const { mobile_no, enquiry_id } = req.body;
     // Required fields check
     const requiredFields = {
       mobile_no,
+      enquiry_id,
     };
 
     // Use the utility function to check for missing fields
