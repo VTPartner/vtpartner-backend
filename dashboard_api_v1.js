@@ -1929,7 +1929,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/check_driver_existence", verifyToken, async (req, res) => {
+router.post("/check_driver_existence", verifyToken, async (req, res) => {
   try {
     const { mobile_no } = req.body;
     // Required fields check
@@ -1986,7 +1986,7 @@ router.get("/check_driver_existence", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/check_handyman_existence", verifyToken, async (req, res) => {
+router.post("/check_handyman_existence", verifyToken, async (req, res) => {
   try {
     const { mobile_no, category_id } = req.body;
     // Required fields check
