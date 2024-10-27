@@ -1792,6 +1792,7 @@ console.log("category_id::", category_id);
       default:
         return res.status(400).json({ message: "Invalid category_id" });
     }
+    console.log("driverTable::", driverTable);
 
     // Prepare common values
     const commonValues = [
