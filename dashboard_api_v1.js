@@ -1964,7 +1964,7 @@ router.post("/check_driver_existence", verifyToken, async (req, res) => {
 
     if (result.rows.length > 0) {
       // Driver exists, return a message with their ID
-      const driverId = result.rows[0].goods_driver_id;
+      const driverId = result[0].goods_driver_id;
       return res.status(200).json({
         message: `Driver already exists with ID: ${driverId}`,
         exists: true,
@@ -2020,7 +2020,7 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
 
     if (result.rows.length > 0) {
       // Driver exists, return a message with their ID
-      const driverId = result.rows[0].goods_driver_id;
+      const driverId = result[0].goods_driver_id;
       return res.status(200).json({
         message: `Handy man already exists with ID: ${driverId}`,
         exists: true,
