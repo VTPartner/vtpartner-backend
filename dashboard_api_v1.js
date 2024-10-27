@@ -9,17 +9,34 @@ console.log("Entered Dashboard Api");
 
 // Utility function to validate required fields
 const checkMissingFields = (requiredFields) => {
-  const missingFields = Object.keys(requiredFields).filter(
-    (field) =>
+  const missingFields = Object.keys(requiredFields).filter((field) => {
+    const isMissing =
       requiredFields[field] === undefined ||
       requiredFields[field] === null ||
-      requiredFields[field] === ""
-  );
-  
+      requiredFields[field] === "";
+
+    if (isMissing) {
+      console.log(`Missing field: ${field}`);
+    }
+
+    return isMissing;
+  });
+
   // Return missing fields if any, otherwise return null
   return missingFields.length > 0 ? missingFields : null;
 };
 
+// const checkMissingFields = (requiredFields) => {
+//   const missingFields = Object.keys(requiredFields).filter(
+//     (field) =>
+//       requiredFields[field] === undefined ||
+//       requiredFields[field] === null ||
+//       requiredFields[field] === ""
+//   );
+
+//   // Return missing fields if any, otherwise return null
+//   return missingFields.length > 0 ? missingFields : null;
+// };
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token is sent in the Authorization header
@@ -36,7 +53,6 @@ const verifyToken = (req, res, next) => {
     res.status(401).send({ message: "Invalid token" });
   }
 };
-
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -118,7 +134,6 @@ router.post("/all_allowed_cities", verifyToken, async (req, res) => {
       return res.status(404).send({ message: "No Data Found" });
     }
 
-    
     res.status(200).send({
       cities: result,
     });
@@ -347,7 +362,6 @@ router.post("/edit_pincode", verifyToken, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
 
 router.post("/service_types", verifyToken, async (req, res) => {
   try {
@@ -1004,7 +1018,7 @@ router.post("/edit_vehicle_price", verifyToken, async (req, res) => {
   }
 });
 
-//All Sub categories [ Electrician , plumber , JCb Driver ] against category_id 
+//All Sub categories [ Electrician , plumber , JCb Driver ] against category_id
 router.post("/all_sub_categories", verifyToken, async (req, res) => {
   try {
     const { category_id } = req.body;
@@ -1546,8 +1560,8 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
 //     let ownerId = null;
 //     if (owner_name && owner_mobile_no) {
 //       const checkOwnerQuery = `
-//         SELECT owner_id 
-//         FROM vtpartner.owner_tbl 
+//         SELECT owner_id
+//         FROM vtpartner.owner_tbl
 //         WHERE owner_mobile_no = $1
 //       `;
 //       const ownerResult = await db.query(checkOwnerQuery, [owner_mobile_no]);
@@ -1584,13 +1598,13 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
 //     // Insert agent data into goods_driverstbl, including image URLs
 //     const insertGoodsDriverQuery = `
 //       INSERT INTO vtpartner.goods_driverstbl (
-//         driver_first_name, mobile_no, gender, aadhar_no, pan_card_no, 
-//         city_name, house_no, full_address, profile_pic, aadhar_card_front, 
-//         aadhar_card_back, pan_card_front, pan_card_back, license_front, 
-//         license_back, insurance_image, noc_image, pollution_certificate_image, 
+//         driver_first_name, mobile_no, gender, aadhar_no, pan_card_no,
+//         city_name, house_no, full_address, profile_pic, aadhar_card_front,
+//         aadhar_card_back, pan_card_front, pan_card_back, license_front,
+//         license_back, insurance_image, noc_image, pollution_certificate_image,
 //         rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id
-//       ) 
-//       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 
+//       )
+//       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
 //       $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
 //       RETURNING goods_driver_id
 //     `;
@@ -1633,7 +1647,7 @@ router.post("/enquiries_all", verifyToken, async (req, res) => {
 //       const insertDocumentQuery = `
 //         INSERT INTO vtpartner.documents_vehicle_verified_tbl (
 //           document_name, document_image_url, goods_driver_id
-//         ) 
+//         )
 //         VALUES ($1, $2, $3)
 //       `;
 
@@ -1887,7 +1901,6 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     } else {
       throw new Error("Failed to retrieve driver ID from insert operation");
     }
-    
 
     // Insert optional documents into documents_vehicle_verified_tbl if any
     if (optionalDocuments && optionalDocuments.length > 0) {
@@ -1918,7 +1931,22 @@ router.post("/register_agent", verifyToken, async (req, res) => {
 
 router.get("/check_driver_existence", verifyToken, async (req, res) => {
   try {
-    const { mobile_no } = req.query;
+    const { mobile_no } = req.body;
+    // Required fields check
+    const requiredFields = {
+      mobile_no,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      // console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
 
     // Validate that mobile_no is provided
     if (!mobile_no) {
@@ -1947,6 +1975,59 @@ router.get("/check_driver_existence", verifyToken, async (req, res) => {
       return res.status(200).json({
         message:
           "Driver does not exist. Mobile number is available for registration.",
+        exists: false,
+      });
+    }
+  } catch (error) {
+    console.error("Error checking driver existence:", error);
+    res.status(500).json({
+      message: "An error occurred while checking driver existence.",
+    });
+  }
+});
+
+router.get("/check_handyman_existence", verifyToken, async (req, res) => {
+  try {
+    const { mobile_no, category_id } = req.body;
+    // Required fields check
+    const requiredFields = {
+      mobile_no,
+      category_id,
+    };
+
+    // Use the utility function to check for missing fields
+    const missingFields = checkMissingFields(requiredFields);
+
+    // If there are missing fields, return an error response
+    if (missingFields) {
+      // console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Query to check if the driver exists with the given mobile number
+    const checkDriverQuery = `
+      SELECT handyman_id 
+      FROM vtpartner.handyman_servicestbl 
+      WHERE mobile_no = $1 AND category_id = $2
+    `;
+
+    const result = await db.query(checkDriverQuery, [mobile_no, category_id]);
+
+    if (result.rows.length > 0) {
+      // Driver exists, return a message with their ID
+      const driverId = result.rows[0].goods_driver_id;
+      return res.status(200).json({
+        message: `Handy man already exists with ID: ${driverId}`,
+        exists: true,
+        driverId: driverId,
+      });
+    } else {
+      // Driver does not exist
+      return res.status(200).json({
+        message:
+          "Handy man does not exist. Mobile number is available for registration.",
         exists: false,
       });
     }
