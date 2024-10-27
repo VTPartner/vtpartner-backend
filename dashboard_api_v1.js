@@ -1824,7 +1824,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
           city_name, house_no, full_address, profile_pic, 
           aadhar_card_front, aadhar_card_back, pan_card_front, 
-          pan_card_back, category_id, city_id, sub_cat_id, service_id,owner_id
+          pan_card_back, category_id, city_id, sub_cat_id, service_id
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
           $10, $11, $12, $13, $14, $15, $16)
