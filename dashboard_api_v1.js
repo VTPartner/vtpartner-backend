@@ -1883,11 +1883,6 @@ router.post("/register_agent", verifyToken, async (req, res) => {
       `;
       driverValues = [
         ...commonValues,
-        agent_photo_url,
-        aadhar_card_front_url,
-        aadhar_card_back_url,
-        pan_card_front_url,
-        pan_card_back_url,
         license_front_url,
         license_back_url,
         insurance_image_url,
