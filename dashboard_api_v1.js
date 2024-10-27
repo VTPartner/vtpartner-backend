@@ -2064,7 +2064,7 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error checking handy man existence:", error);
+    console.error("Error checking handy man existence:", error.message);
     if (error.message === "No Data Found") {
       return res.status(200).json({
         message:
@@ -2076,6 +2076,8 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
         message: "An error occurred while checking handy man existence.",
       });
     }
+
+    console.error("Error checking handy man existence:", error);
   }
 });
 
