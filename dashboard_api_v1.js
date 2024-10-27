@@ -1810,7 +1810,6 @@ router.post("/register_agent", verifyToken, async (req, res) => {
       aadhar_card_back_url,
       pan_card_front_url,
       pan_card_back_url,
-      ownerId,
     ];
 
     // Insert into appropriate driver table
@@ -1827,7 +1826,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           pan_card_back, category_id, city_id, sub_cat_id, service_id
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
-          $10, $11, $12, $13, $14, $15, $16)
+          $10, $11, $12, $13, $14, $15, $16,$17)
         RETURNING ${driverIdField}
       `;
       driverValues = [
@@ -1850,7 +1849,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
           $10, $11, $12, $13, $14, $15, $16, $17, $18, 
-          $19, $20, $21, $22, $23, $24, $25)
+          $19, $20, $21, $22, $23, $24)
         RETURNING ${driverIdField}
       `;
       driverValues = [
@@ -1870,6 +1869,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
         category_id,
         vehicle_id,
         city_id,
+        ownerId,
       ];
     }
 
