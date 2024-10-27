@@ -1743,7 +1743,9 @@ router.post("/register_agent", verifyToken, async (req, res) => {
         FROM vtpartner.owner_tbl 
         WHERE owner_mobile_no = $1
       `;
-      const ownerResult = await db.query(checkOwnerQuery, [owner_mobile_no]);
+      const ownerResult = await db.selectQuery(checkOwnerQuery, [
+        owner_mobile_no,
+      ]);
 
       if (ownerResult.rows.length > 0) {
         // Owner exists, get the existing owner ID
