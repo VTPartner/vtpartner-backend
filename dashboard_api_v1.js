@@ -1810,9 +1810,9 @@ router.post("/register_agent", verifyToken, async (req, res) => {
         driverIdField = "jcb_crane_driver_id";
         break;
       case "4": // Driver
-        driverTable = "vtpartner.jcb_crane_driverstbl";
-        nameColumn = "driver_name";
-        driverIdField = "jcb_crane_driver_id";
+        driverTable = "vtpartner.other_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "other_driver_id";
         break;
       case "5": // Handyman Service
         driverTable = "vtpartner.handyman_servicestbl";
@@ -1845,7 +1845,7 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     let insertDriverQuery;
     let driverValues;
     console.log("commonValues:", commonValues);
-    if (category_id === "5") {
+    if (category_id === "4" || category_id === "5") {
       // Handyman Service specific columns
       insertDriverQuery = `
         INSERT INTO ${driverTable} (
@@ -2044,11 +2044,20 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
     }
 
     // Query to check if the driver exists with the given mobile number
-    const checkDriverQuery = `
+    let checkDriverQuery = "";
+    if (category_id === "5") {
+      checkDriverQuery = `
       SELECT handyman_id 
       FROM vtpartner.handyman_servicestbl 
       WHERE mobile_no = $1 AND category_id = $2
     `;
+    } else {
+      checkDriverQuery = `
+      SELECT other_driver_id 
+      FROM vtpartner.other_driverstbl 
+      WHERE mobile_no = $1 AND category_id = $2
+    `;
+    }
 
     const result = await db.selectQuery(checkDriverQuery, [
       mobile_no,
