@@ -1960,7 +1960,7 @@ router.post("/check_driver_existence", verifyToken, async (req, res) => {
       WHERE mobile_no = $1
     `;
 
-    const result = await db.query(checkDriverQuery, [mobile_no]);
+    const result = await db.selectQuery(checkDriverQuery, [mobile_no]);
 
     if (result.rows.length > 0) {
       // Driver exists, return a message with their ID
@@ -2013,7 +2013,10 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
       WHERE mobile_no = $1 AND category_id = $2
     `;
 
-    const result = await db.query(checkDriverQuery, [mobile_no, category_id]);
+    const result = await db.selectQuery(checkDriverQuery, [
+      mobile_no,
+      category_id,
+    ]);
 
     if (result.rows.length > 0) {
       // Driver exists, return a message with their ID
