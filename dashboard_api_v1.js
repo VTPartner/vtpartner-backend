@@ -1917,6 +1917,19 @@ router.post("/register_agent", verifyToken, async (req, res) => {
       }
     }
 
+    try {
+      const query =
+        "update vtpartner.enquirytbl set status=2 where enquiry_id=$1";
+      const values = [enquiry_id];
+      const rowCount = await db.updateQuery(query, values);
+    } catch (error) {
+      console.error("Error registering new agent:", error);
+      res.status(500).json({
+        message: "An error occurred while registering the agent.",
+      });
+      return;
+    }
+
     // Respond with success
     res.status(200).json({
       message: `Agent and owner registered successfully with Agent ID: ${driverId}`,
