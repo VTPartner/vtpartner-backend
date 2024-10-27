@@ -1962,7 +1962,7 @@ router.post("/check_driver_existence", verifyToken, async (req, res) => {
 
     const result = await db.selectQuery(checkDriverQuery, [mobile_no]);
 
-    if (result.rows.length > 0) {
+    if (result.length > 0) {
       // Driver exists, return a message with their ID
       const driverId = result[0].goods_driver_id;
       return res.status(200).json({
@@ -2018,7 +2018,7 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
       category_id,
     ]);
 
-    if (result.rows.length > 0) {
+    if (result.length > 0) {
       // Driver exists, return a message with their ID
       const driverId = result[0].goods_driver_id;
       return res.status(200).json({
@@ -2035,9 +2035,9 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error checking driver existence:", error);
+    console.error("Error checking handy man existence:", error);
     res.status(500).json({
-      message: "An error occurred while checking driver existence.",
+      message: "An error occurred while checking handy man existence.",
     });
   }
 });
