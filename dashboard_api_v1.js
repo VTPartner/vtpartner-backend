@@ -1990,9 +1990,18 @@ router.post("/check_driver_existence", verifyToken, async (req, res) => {
     }
   } catch (error) {
     console.error("Error checking driver existence:", error);
-    res.status(500).json({
-      message: "An error occurred while checking driver existence.",
-    });
+
+    if (error.message === "No Data Found") {
+      return res.status(200).json({
+        message:
+          "Handy man does not exist. Mobile number is available for registration.",
+        exists: false,
+      });
+    } else {
+      res.status(500).json({
+        message: "An error occurred while checking handy man existence.",
+      });
+    }
   }
 });
 
@@ -2056,16 +2065,17 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
     }
   } catch (error) {
     console.error("Error checking handy man existence:", error);
-    if (error === "No Data Found") {
+    if (error.message === "No Data Found") {
       return res.status(200).json({
         message:
           "Handy man does not exist. Mobile number is available for registration.",
         exists: false,
       });
+    } else {
+      res.status(500).json({
+        message: "An error occurred while checking handy man existence.",
+      });
     }
-    res.status(500).json({
-      message: "An error occurred while checking handy man existence.",
-    });
   }
 });
 
