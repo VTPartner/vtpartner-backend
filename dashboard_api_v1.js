@@ -1765,27 +1765,27 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     console.log("category_id type:", typeof category_id, "value:", category_id);
 
     switch (category_id) {
-      case 1: // Goods Driver
+      case "1": // Goods Driver
         driverTable = "vtpartner.goods_driverstbl";
         nameColumn = "driver_first_name";
         driverIdField = "goods_driver_id";
         break;
-      case 2: // Cab Driver
+      case "2": // Cab Driver
         driverTable = "vtpartner.cab_driverstbl";
         nameColumn = "driver_first_name";
         driverIdField = "cab_driver_id";
         break;
-      case 3: // JCB/Crane Driver
+      case "3": // JCB/Crane Driver
         driverTable = "vtpartner.jcb_crane_driverstbl";
         nameColumn = "driver_name";
         driverIdField = "jcb_crane_driver_id";
         break;
-      // case 4: // Driver
-      //   driverTable = "vtpartner.jcb_crane_driverstbl";
-      //   nameColumn = "driver_name";
-      //   driverIdField = "jcb_crane_driver_id";
-      //   break;
-      case 5: // Handyman Service
+      case "4": // Driver
+        driverTable = "vtpartner.jcb_crane_driverstbl";
+        nameColumn = "driver_name";
+        driverIdField = "jcb_crane_driver_id";
+        break;
+      case "5": // Handyman Service
         driverTable = "vtpartner.handyman_servicestbl";
         nameColumn = "name";
         driverIdField = "handyman_id";
@@ -1816,8 +1816,8 @@ router.post("/register_agent", verifyToken, async (req, res) => {
     // Insert into appropriate driver table
     let insertDriverQuery;
     let driverValues;
-console.log("commonValues:", commonValues);
-    if (category_id === 5) {
+    console.log("commonValues:", commonValues);
+    if (category_id === "5") {
       // Handyman Service specific columns
       insertDriverQuery = `
         INSERT INTO ${driverTable} (
