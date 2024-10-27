@@ -1814,7 +1814,7 @@ console.log("category_id::", category_id);
     // Insert into appropriate driver table
     let insertDriverQuery;
     let driverValues;
-
+console.log("commonValues:", commonValues);
     if (category_id === 5) {
       // Handyman Service specific columns
       insertDriverQuery = `
