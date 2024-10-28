@@ -1853,10 +1853,10 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
           city_name, house_no, full_address, profile_pic, 
           aadhar_card_front, aadhar_card_back, pan_card_front, 
-          pan_card_back, category_id, city_id, sub_cat_id, service_id
+          pan_card_back, category_id, city_id, sub_cat_id, service_id,status
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
-          $10, $11, $12, $13, $14, $15, $16,$17)
+          $10, $11, $12, $13, $14, $15, $16,$17,1)
         RETURNING ${driverIdField}
       `;
       driverValues = [
@@ -1875,11 +1875,11 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           aadhar_card_front, aadhar_card_back, pan_card_front, 
           pan_card_back, license_front, license_back, 
           insurance_image, noc_image, pollution_certificate_image, 
-          rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image
+          rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,status
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
           $10, $11, $12, $13, $14, $15, $16, $17, $18, 
-          $19, $20, $21, $22, $23, $24,$25)
+          $19, $20, $21, $22, $23, $24,$25,1)
         RETURNING ${driverIdField}
       `;
       driverValues = [
