@@ -2191,6 +2191,30 @@ router.post("/all_jcb_crane_drivers", verifyToken, async (req, res) => {
   }
 });
 
+//All HandyMan
+router.post("/all_handy_man", verifyToken, async (req, res) => {
+  try {
+    const query =
+      "select handyman_id,name,profile_pic,is_online,ratings,mobile_no,handyman_servicestbl.registration_date,handyman_servicestbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,handyman_servicestbl.category_id,handyman_servicestbl.sub_cat_id,handyman_servicestbl.service_id,city_id,aadhar_no,pan_card_no,handyman_servicestbl.house_no,handyman_servicestbl.city_name,full_address,gender,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,sub_cat_name,service_name,category_name from vtpartner.handyman_servicestbl LEFT JOIN vtpartner.sub_categorytbl ON handyman_servicestbl.sub_cat_id=sub_categorytbl.sub_cat_id LEFT JOIN vtpartner.other_servicestbl ON handyman_servicestbl.service_id=other_servicestbl.service_id LEFT JOIN vtpartner.categorytbl ON categorytbl.category_id=handyman_servicestbl.category_id order by handyman_id desc";
+    const values = [];
+
+    const result = await db.selectQuery(query, values);
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: "No Data Found" });
+    }
+
+    res.status(200).send({
+      all_handy_man_details: result,
+    });
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    if (err.message === "No Data Found")
+      res.status(404).send({ message: "No Data Found" });
+    else res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
 //Edit  Driver Details
 router.post("/edit_driver_details", verifyToken, async (req, res) => {
   try {
