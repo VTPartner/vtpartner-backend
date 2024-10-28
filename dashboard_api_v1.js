@@ -2191,7 +2191,7 @@ router.post("/all_jcb_crane_drivers", verifyToken, async (req, res) => {
   }
 });
 
-//Edit Goods Driver Details
+//Edit Driver Details
 router.post("/edit_driver_details", verifyToken, async (req, res) => {
   try {
     const {
@@ -2231,7 +2231,7 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
       rc_no,
       insurance_no,
       noc_no,
-      owner_id
+      owner_id,
     } = req.body;
 
     const requiredFields = {
@@ -2271,7 +2271,222 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
       rc_no,
       insurance_no,
       noc_no,
-      owner_id
+      owner_id,
+    };
+
+    const missingFields = checkMissingFields(requiredFields);
+
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    let ownerId = null;
+    if (owner_name && owner_mobile_no) {
+      try {
+        const checkOwnerQuery = `
+          SELECT owner_id 
+          FROM vtpartner.owner_tbl 
+          WHERE owner_mobile_no = $1
+        `;
+        const ownerResult = await db.selectQuery(checkOwnerQuery, [
+          owner_mobile_no,
+        ]);
+
+        if (ownerResult.length > 0) {
+          ownerId = ownerResult[0].owner_id;
+        } else {
+          const insertOwnerQuery = `
+            INSERT INTO vtpartner.owner_tbl (
+              owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+            ) VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING owner_id
+          `;
+
+          const ownerValues = [
+            owner_name,
+            owner_mobile_no,
+            owner_house_no,
+            owner_city_name,
+            owner_address,
+            owner_photo_url,
+          ];
+
+          const newOwnerResult = await db.insertQuery(
+            insertOwnerQuery,
+            ownerValues
+          );
+          ownerId = newOwnerResult[0].owner_id;
+        }
+      } catch (error) {
+        console.log("Owner error::", error);
+        return res
+          .status(500)
+          .send({ message: "Error processing owner data." });
+      }
+    }
+
+    let driverTable, nameColumn, driverIdField;
+
+    switch (category_id) {
+      case "1":
+        driverTable = "vtpartner.goods_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "goods_driver_id";
+        break;
+      case "2":
+        driverTable = "vtpartner.cab_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "cab_driver_id";
+        break;
+      case "3":
+        driverTable = "vtpartner.jcb_crane_driverstbl";
+        nameColumn = "driver_name";
+        driverIdField = "jcb_crane_driver_id";
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid category_id" });
+    }
+
+    insertDriverQuery = `
+    INSERT INTO ${driverTable} (
+      ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
+      city_name, house_no, full_address, profile_pic, 
+      aadhar_card_front, aadhar_card_back, pan_card_front, 
+      pan_card_back, license_front, license_back, 
+      insurance_image, noc_image, pollution_certificate_image, 
+      rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,status,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no,status
+    ) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+      $10, $11, $12, $13, $14, $15, $16, $17, $18, 
+      $19, $20, $21, $22, $23, $24,$25,1,$26,$27,$28,$29,$30,1)
+    RETURNING ${driverIdField}
+  `;
+
+    const driverValues = [
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      ownerId,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+    ];
+
+    const rowCount = await db.insertQuery(insertDriverQuery, driverValues);
+
+    res.status(200).send({ message: `${rowCount} row(s) updated` });
+  } catch (err) {
+    console.error("Error executing add new driver query", err.stack);
+    res.status(500).send({ message: "Error executing add new driver query" });
+  }
+});
+//Edit Driver Details
+router.post("/add_driver_details", verifyToken, async (req, res) => {
+  try {
+    const {
+      driver_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      owner_name,
+      owner_mobile_no,
+      owner_house_no,
+      owner_city_name,
+      owner_address,
+      owner_photo_url,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+      owner_id,
+    } = req.body;
+
+    const requiredFields = {
+      driver_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      owner_name,
+      owner_mobile_no,
+      owner_house_no,
+      owner_city_name,
+      owner_address,
+      owner_photo_url,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+      owner_id,
     };
 
     const missingFields = checkMissingFields(requiredFields);
@@ -2298,17 +2513,19 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
         if (ownerResult.length > 0) {
           ownerId = ownerResult[0].owner_id;
           const updateOwnerDetails = `UPDATE vtpartner.owner_tbl SET house_no=$1, city_name=$2, address=$3,profile_photo=$4,owner_name=$5 WHERE owner_id=$6`;
-          const values = [owner_house_no,
+          const values = [
+            owner_house_no,
             owner_city_name,
             owner_address,
             owner_photo_url,
-          owner_name,
-        owner_id]
+            owner_name,
+            owner_id,
+          ];
 
-        const rowCount = await db.updateQuery(updateOwnerDetails, values);
-        console.log(`Owner Details added successfully ${rowCount} row(s) updated`)
-          
-
+          const rowCount = await db.updateQuery(updateOwnerDetails, values);
+          console.log(
+            `Owner Details added successfully ${rowCount} row(s) updated`
+          );
         } else {
           const insertOwnerQuery = `
             INSERT INTO vtpartner.owner_tbl (
@@ -2326,12 +2543,17 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
             owner_photo_url,
           ];
 
-          const newOwnerResult = await db.insertQuery(insertOwnerQuery, ownerValues);
+          const newOwnerResult = await db.insertQuery(
+            insertOwnerQuery,
+            ownerValues
+          );
           ownerId = newOwnerResult[0].owner_id;
         }
       } catch (error) {
         console.log("Owner error::", error);
-        return res.status(500).send({ message: "Error processing owner data." });
+        return res
+          .status(500)
+          .send({ message: "Error processing owner data." });
       }
     }
 
@@ -2402,7 +2624,7 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
       rc_no,
       insurance_no,
       noc_no,
-      driver_id
+      driver_id,
     ];
 
     const rowCount = await db.updateQuery(updateDriverQuery, driverValues);
