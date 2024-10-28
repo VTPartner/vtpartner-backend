@@ -2191,6 +2191,228 @@ router.post("/all_jcb_crane_drivers", verifyToken, async (req, res) => {
   }
 });
 
+//Edit Goods Driver Details
+router.post("/edit_driver_details", verifyToken, async (req, res) => {
+  try {
+    const {
+      driver_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      owner_name,
+      owner_mobile_no,
+      owner_house_no,
+      owner_city_name,
+      owner_address,
+      owner_photo_url,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+      owner_id
+    } = req.body;
+
+    const requiredFields = {
+      driver_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      owner_name,
+      owner_mobile_no,
+      owner_house_no,
+      owner_city_name,
+      owner_address,
+      owner_photo_url,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+      owner_id
+    };
+
+    const missingFields = checkMissingFields(requiredFields);
+
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    let ownerId = null;
+    if (owner_name && owner_mobile_no) {
+      try {
+        const checkOwnerQuery = `
+          SELECT owner_id 
+          FROM vtpartner.owner_tbl 
+          WHERE owner_mobile_no = $1
+        `;
+        const ownerResult = await db.selectQuery(checkOwnerQuery, [
+          owner_mobile_no,
+        ]);
+
+        if (ownerResult.length > 0) {
+          ownerId = ownerResult[0].owner_id;
+          const updateOwnerDetails = `UPDATE vtpartner.owner_tbl SET house_no=$1, city_name=$2, address=$3, profile_photo=$4,profile_photo=$5 WHERE owner_id=$6`
+          const values = [owner_house_no,
+            owner_city_name,
+            owner_address,
+            owner_photo_url,
+          owner_name,
+        owner_id]
+
+        const rowCount = await db.updateQuery(updateOwnerDetails, values);
+        console.log(`Owner Details added successfully ${rowCount} row(s) updated`)
+          
+
+        } else {
+          const insertOwnerQuery = `
+            INSERT INTO vtpartner.owner_tbl (
+              owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+            ) VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING owner_id
+          `;
+
+          const ownerValues = [
+            owner_name,
+            owner_mobile_no,
+            owner_house_no,
+            owner_city_name,
+            owner_address,
+            owner_photo_url,
+          ];
+
+          const newOwnerResult = await db.insertQuery(insertOwnerQuery, ownerValues);
+          ownerId = newOwnerResult[0].owner_id;
+        }
+      } catch (error) {
+        console.log("Owner error::", error);
+        return res.status(500).send({ message: "Error processing owner data." });
+      }
+    }
+
+    let driverTable, nameColumn, driverIdField;
+
+    switch (category_id) {
+      case "1":
+        driverTable = "vtpartner.goods_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "goods_driver_id";
+        break;
+      case "2":
+        driverTable = "vtpartner.cab_driverstbl";
+        nameColumn = "driver_first_name";
+        driverIdField = "cab_driver_id";
+        break;
+      case "3":
+        driverTable = "vtpartner.jcb_crane_driverstbl";
+        nameColumn = "driver_name";
+        driverIdField = "jcb_crane_driver_id";
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid category_id" });
+    }
+
+    const updateDriverQuery = `
+      UPDATE ${driverTable} SET
+        ${nameColumn} = $1, mobile_no = $2, gender = $3, aadhar_no = $4, pan_card_no = $5, 
+        city_name = $6, house_no = $7, full_address = $8, profile_pic = $9, 
+        aadhar_card_front = $10, aadhar_card_back = $11, pan_card_front = $12, 
+        pan_card_back = $13, license_front = $14, license_back = $15, 
+        insurance_image = $16, noc_image = $17, pollution_certificate_image = $18, 
+        rc_image = $19, vehicle_image = $20, category_id = $21, vehicle_id = $22, 
+        city_id = $23, owner_id = $24, vehicle_plate_image = $25, 
+        driving_license_no = $26, vehicle_plate_no = $27, rc_no = $28, 
+        insurance_no = $29, noc_no = $30
+      WHERE ${driverIdField} = $31
+    `;
+
+    const driverValues = [
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      license_front_url,
+      license_back_url,
+      insurance_image_url,
+      noc_image_url,
+      pollution_certificate_image_url,
+      rc_image_url,
+      vehicle_image_url,
+      category_id,
+      vehicle_id,
+      city_id,
+      ownerId,
+      vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
+      driver_id
+    ];
+
+    const rowCount = await db.updateQuery(updateDriverQuery, driverValues);
+
+    res.status(200).send({ message: `${rowCount} row(s) updated` });
+  } catch (err) {
+    console.error("Error executing updating driver query", err.stack);
+    res.status(500).send({ message: "Error executing updating driver query" });
+  }
+});
 
 
 
