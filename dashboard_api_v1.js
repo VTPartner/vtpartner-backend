@@ -1711,6 +1711,11 @@ router.post("/register_agent", verifyToken, async (req, res) => {
       owner_address,
       owner_photo_url,
       vehicle_plate_image,
+      driving_license_no,
+      vehicle_plate_no,
+      rc_no,
+      insurance_no,
+      noc_no,
     } = req.body;
 
     // Required fields check
@@ -1875,11 +1880,11 @@ router.post("/register_agent", verifyToken, async (req, res) => {
           aadhar_card_front, aadhar_card_back, pan_card_front, 
           pan_card_back, license_front, license_back, 
           insurance_image, noc_image, pollution_certificate_image, 
-          rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,status
+          rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,status,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no
         ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
           $10, $11, $12, $13, $14, $15, $16, $17, $18, 
-          $19, $20, $21, $22, $23, $24,$25,1)
+          $19, $20, $21, $22, $23, $24,$25,1,$26,$27,$28,$29,$30)
         RETURNING ${driverIdField}
       `;
       driverValues = [
@@ -1896,6 +1901,11 @@ router.post("/register_agent", verifyToken, async (req, res) => {
         city_id,
         ownerId,
         vehicle_plate_image,
+        driving_license_no,
+        vehicle_plate_no,
+        rc_no,
+        insurance_no,
+        noc_no,
       ];
     }
 
@@ -2113,7 +2123,7 @@ router.post("/check_handyman_existence", verifyToken, async (req, res) => {
 router.post("/all_goods_drivers", verifyToken, async (req, res) => {
   try {
     const query =
-      "select goods_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,goods_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,goods_driverstbl.category_id,goods_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type from vtpartner.goods_driverstbl LEFT JOIN vtpartner.categorytbl ON goods_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id LEFT JOIN vtpartner.vehiclestbl ON goods_driverstbl.vehicle_id = vehiclestbl.vehicle_id order by goods_driver_id desc";
+      "select goods_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,goods_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,goods_driverstbl.category_id,goods_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no from vtpartner.goods_driverstbl LEFT JOIN vtpartner.categorytbl ON goods_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id LEFT JOIN vtpartner.vehiclestbl ON goods_driverstbl.vehicle_id = vehiclestbl.vehicle_id order by goods_driver_id desc";
     const values = [];
 
     const result = await db.selectQuery(query, values);
@@ -2137,7 +2147,7 @@ router.post("/all_goods_drivers", verifyToken, async (req, res) => {
 router.post("/all_cab_drivers", verifyToken, async (req, res) => {
   try {
     const query =
-      "select cab_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,cab_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,cab_driverstbl.category_id,cab_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type from vtpartner.cab_driverstbl LEFT JOIN vtpartner.categorytbl ON cab_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.vehiclestbl ON cab_driverstbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id  order by cab_driver_id desc";
+      "select cab_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,cab_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,cab_driverstbl.category_id,cab_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no from vtpartner.cab_driverstbl LEFT JOIN vtpartner.categorytbl ON cab_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.vehiclestbl ON cab_driverstbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id  order by cab_driver_id desc";
     const values = [];
 
     const result = await db.selectQuery(query, values);
@@ -2161,7 +2171,7 @@ router.post("/all_cab_drivers", verifyToken, async (req, res) => {
 router.post("/all_jcb_crane_drivers", verifyToken, async (req, res) => {
   try {
     const query =
-      "select jcb_crane_driver_id,driver_name,profile_pic,is_online,ratings,mobile_no,registration_date,jcb_crane_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,jcb_crane_driverstbl.category_id,jcb_crane_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type from vtpartner.jcb_crane_driverstbl LEFT JOIN vtpartner.categorytbl ON jcb_crane_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.vehiclestbl ON jcb_crane_driverstbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id  order by jcb_crane_driver_id desc;";
+      "select jcb_crane_driver_id,driver_name,profile_pic,is_online,ratings,mobile_no,registration_date,jcb_crane_driverstbl.time,r_lat,r_lng,current_lat,current_lng,status,recent_online_pic,is_verified,jcb_crane_driverstbl.category_id,jcb_crane_driverstbl.vehicle_id,city_id,aadhar_no,pan_card_no,house_no,city_name,full_address,gender,owner_id,aadhar_card_front,aadhar_card_back,pan_card_front,pan_card_back,license_front,license_back,insurance_image,noc_image,pollution_certificate_image,rc_image,vehicle_image,vehicle_plate_image,category_name,vehicle_name,category_type,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no from vtpartner.jcb_crane_driverstbl LEFT JOIN vtpartner.categorytbl ON jcb_crane_driverstbl.category_id = categorytbl.category_id LEFT JOIN vtpartner.vehiclestbl ON jcb_crane_driverstbl.vehicle_id = vehiclestbl.vehicle_id LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id  order by jcb_crane_driver_id desc;";
     const values = [];
 
     const result = await db.selectQuery(query, values);
