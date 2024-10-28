@@ -2518,23 +2518,27 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
     if (owner_name && owner_mobile_no) {
       try {
         const checkOwnerQuery = `
-          SELECT owner_id 
-          FROM vtpartner.owner_tbl 
-          WHERE owner_mobile_no = $1
-        `;
+        SELECT owner_id 
+        FROM vtpartner.owner_tbl 
+        WHERE owner_mobile_no = $1
+      `;
         const ownerResult = await db.selectQuery(checkOwnerQuery, [
           owner_mobile_no,
         ]);
 
         if (ownerResult.length > 0) {
+          // Owner exists, get the existing owner ID
           ownerId = ownerResult[0].owner_id;
-        } else {
+        }
+      } catch (error) {
+        if (error.message === "No Data Found") {
+          // Insert owner data into owner_tbl if it does not exist
           const insertOwnerQuery = `
-            INSERT INTO vtpartner.owner_tbl (
-              owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
-            ) VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING owner_id
-          `;
+        INSERT INTO vtpartner.owner_tbl (
+          owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING owner_id
+      `;
 
           const ownerValues = [
             owner_name,
@@ -2549,13 +2553,17 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
             insertOwnerQuery,
             ownerValues
           );
-          ownerId = newOwnerResult[0].owner_id;
+
+          // Extract owner_id if there is a returned row
+          if (Array.isArray(newOwnerResult) && newOwnerResult.length > 0) {
+            ownerId = newOwnerResult[0].owner_id;
+          } else {
+            throw new Error(
+              "Failed to retrieve driver ID from insert operation"
+            );
+          }
         }
-      } catch (error) {
         console.log("Owner error::", error);
-        return res
-          .status(500)
-          .send({ message: "Error processing owner data." });
       }
     }
 
