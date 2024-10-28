@@ -2637,7 +2637,7 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
       noc_no,
     ];
 
-    const rowCount = await db.updateQuery(updateDriverQuery, driverValues);
+    const rowCount = await db.updateQuery(insertDriverQuery, driverValues);
 
     res.status(200).send({ message: `${rowCount} row(s) updated` });
   } catch (err) {
