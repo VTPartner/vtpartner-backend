@@ -2600,7 +2600,7 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
     ) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
       $10, $11, $12, $13, $14, $15, $16, $17, $18, 
-      $19, $20, $21, $22, $23, $24,$25,1,$26,$27,$28,$29,$30,'1')
+      $19, $20, $21, $22, $23, $24,$25,1,$26,$27,$28,$29,$30,$31)
     RETURNING ${driverIdField}
   `;
 
@@ -2635,6 +2635,7 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
       rc_no,
       insurance_no,
       noc_no,
+      "1",
     ];
 
     const rowCount = await db.updateQuery(insertDriverQuery, driverValues);
