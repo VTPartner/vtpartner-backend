@@ -2367,7 +2367,7 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
         rc_image = $19, vehicle_image = $20, category_id = $21, vehicle_id = $22, 
         city_id = $23, owner_id = $24, vehicle_plate_image = $25, 
         driving_license_no = $26, vehicle_plate_no = $27, rc_no = $28, 
-        insurance_no = $29, noc_no = $30
+        insurance_no = $29, noc_no = $30,time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
       WHERE ${driverIdField} = $31
     `;
 
