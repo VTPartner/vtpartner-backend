@@ -2736,7 +2736,7 @@ router.post("/edit_handyman_details", verifyToken, async (req, res) => {
     const updateDriverQuery = `
       UPDATE vtpartner.handyman_servicestbl
       SET 
-        agent_name = $1,
+        name = $1,
         mobile_no = $2,
         gender = $3,
         aadhar_no = $4,
