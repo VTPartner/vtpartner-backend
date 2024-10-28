@@ -2531,6 +2531,7 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
           ownerId = ownerResult[0].owner_id;
         }
       } catch (error) {
+        console.log("Owner error::", error);
         if (error.message === "No Data Found") {
           // Insert owner data into owner_tbl if it does not exist
           const insertOwnerQuery = `
@@ -2563,7 +2564,6 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
             );
           }
         }
-        console.log("Owner error::", error);
       }
     }
 
