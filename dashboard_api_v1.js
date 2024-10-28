@@ -2446,7 +2446,8 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
     res.status(500).send({ message: "Error executing updating driver query" });
   }
 });
-//Edit Driver Details
+
+//Add Driver Details
 router.post("/add_driver_details", verifyToken, async (req, res) => {
   try {
     const {
@@ -2675,6 +2676,115 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
     res.status(500).send({ message: "Error executing add new driver query" });
   }
 });
+
+
+//Edit  HandyMan Details
+router.post("/edit_handyman_details", verifyToken, async (req, res) => {
+  try {
+    const {
+      handyman_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      category_id,
+      sub_cat_id,
+      service_id,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+    } = req.body;
+
+    const requiredFields = {
+      handyman_id,
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      category_id,
+      sub_cat_id,
+      service_id,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+    };
+
+    const missingFields = checkMissingFields(requiredFields);
+
+    if (missingFields) {
+      console.log(`Missing required fields: ${missingFields.join(", ")}`);
+      return res.status(400).send({
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Prepare the update query and values
+    const updateDriverQuery = `
+      UPDATE vtpartner.handyman_servicestbl
+      SET 
+        agent_name = $1,
+        mobile_no = $2,
+        gender = $3,
+        aadhar_no = $4,
+        pan_card_no = $5,
+        city_name = $6,
+        house_no = $7,
+        full_address = $8,
+        profile_pic = $9,
+        aadhar_card_front = $10,
+        aadhar_card_back = $11,
+        pan_card_front = $12,
+        pan_card_back = $13,
+        category_id = $14,
+        city_id = $15,
+        sub_cat_id = $16,
+        service_id = $17,
+        status = 1
+      WHERE handyman_id = $18
+    `;
+
+    const driverValues = [
+      agent_name,
+      mobile_no,
+      gender,
+      aadhar_no,
+      pan_no,
+      city_name,
+      house_no,
+      address,
+      agent_photo_url,
+      aadhar_card_front_url,
+      aadhar_card_back_url,
+      pan_card_front_url,
+      pan_card_back_url,
+      category_id,
+      city_id,
+      sub_cat_id,
+      service_id,
+      handyman_id, // This is the last parameter for the WHERE clause
+    ];
+
+    const rowCount = await db.updateQuery(updateDriverQuery, driverValues);
+
+    res.status(200).send({ message: `${rowCount} row(s) updated` });
+  } catch (err) {
+    console.error("Error executing updating driver query", err.stack);
+    res.status(500).send({ message: "Error executing updating driver query" });
+  }
+});
+
 
 
 
