@@ -2297,7 +2297,7 @@ router.post("/edit_driver_details", verifyToken, async (req, res) => {
 
         if (ownerResult.length > 0) {
           ownerId = ownerResult[0].owner_id;
-          const updateOwnerDetails = `UPDATE vtpartner.owner_tbl SET house_no=$1, city_name=$2, address=$3, profile_photo=$4,profile_photo=$5 WHERE owner_id=$6`
+          const updateOwnerDetails = `UPDATE vtpartner.owner_tbl SET house_no=$1, city_name=$2, address=$3,profile_photo=$4,owner_name=$5 WHERE owner_id=$6`;
           const values = [owner_house_no,
             owner_city_name,
             owner_address,
