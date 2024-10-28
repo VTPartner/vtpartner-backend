@@ -2596,7 +2596,7 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
       aadhar_card_front, aadhar_card_back, pan_card_front, 
       pan_card_back, license_front, license_back, 
       insurance_image, noc_image, pollution_certificate_image, 
-      rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,status,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no,status
+      rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no,status
     ) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
       $10, $11, $12, $13, $14, $15, $16, $17, $18, 
