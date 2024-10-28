@@ -2589,19 +2589,24 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
         return res.status(400).json({ message: "Invalid category_id" });
     }
 
-    insertDriverQuery = `
+    const insertDriverQuery = `
     INSERT INTO ${driverTable} (
       ${nameColumn}, mobile_no, gender, aadhar_no, pan_card_no, 
       city_name, house_no, full_address, profile_pic, 
       aadhar_card_front, aadhar_card_back, pan_card_front, 
       pan_card_back, license_front, license_back, 
       insurance_image, noc_image, pollution_certificate_image, 
-      rc_image, vehicle_image, category_id, vehicle_id, city_id, owner_id,vehicle_plate_image,driving_license_no,vehicle_plate_no,rc_no,insurance_no,noc_no,status
+      rc_image, vehicle_image, category_id, vehicle_id, city_id, 
+      owner_id, vehicle_plate_image, driving_license_no, 
+      vehicle_plate_no, rc_no, insurance_no, noc_no, status
     ) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+    VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, 
       $10, $11, $12, $13, $14, $15, $16, $17, $18, 
-      $19, $20, $21, $22, $23, $24,$25,1,$26,$27,$28,$29,$30,$31)
-    RETURNING ${driverIdField}
+      $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, 
+      $29, $30, '1'
+    )
+    RETURNING ${driverIdField};
   `;
 
     const driverValues = [
@@ -2635,10 +2640,10 @@ router.post("/add_driver_details", verifyToken, async (req, res) => {
       rc_no,
       insurance_no,
       noc_no,
-      "1",
     ];
 
-    const rowCount = await db.updateQuery(insertDriverQuery, driverValues);
+  const rowCount = await db.updateQuery(insertDriverQuery, driverValues);
+  
 
     res.status(200).send({ message: `${rowCount} row(s) updated` });
   } catch (err) {
