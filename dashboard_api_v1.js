@@ -2147,7 +2147,7 @@ router.post("/all_cab_drivers", verifyToken, async (req, res) => {
     }
 
     res.status(200).send({
-      all_goods_drivers: result,
+      all_cab_drivers: result,
     });
   } catch (err) {
     console.error("Error executing query", err.stack);
